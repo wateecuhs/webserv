@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/11 14:11:17 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/22 16:17:41 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 class Server
 {
 	private:
-		int port;
+		int				port;
+		unsigned long	host;
 	public:
 		Server();
 		Server(int port);
