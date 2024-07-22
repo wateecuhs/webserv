@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/22 15:14:24 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/22 16:07:07 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <poll.h>
 #include <sys/epoll.h>
 
-int	init_socket(unsigned int port)
+int	init_socket(int epfd, unsigned int port, epoll_event &ep_event)
 {
 	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -26,6 +26,9 @@ int	init_socket(unsigned int port)
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 
 	bind(socketfd, (sockaddr *)&server_addr, sizeof(server_addr));
+	ep_event.data.fd = socketfd;
+	ep_event.events = EPOLLIN | EPOLLPRI;
+	epoll_ctl(epfd, EPOLL_CTL_ADD, socketfd, &ep_event);
 	return (socketfd);
 }
 
@@ -40,17 +43,11 @@ int main(int argc, char **argv)
 	epoll_event	ep_events[2];
 	int			triggered_events;
 
-	fds[0] = init_socket(3000);
-	fds[1] = init_socket(8000);
-	ep_events[0].data.fd = fds[0];
-	ep_events[0].events = EPOLLIN | EPOLLPRI;
-	ep_events[1].data.fd = fds[1];
-	ep_events[1].events = EPOLLIN | EPOLLPRI;
+	epfd = epoll_create(1);
+	fds[0] = init_socket(epfd, 3000, ep_events[0]);
+	fds[1] = init_socket(epfd, 8000, ep_events[1]);
 	listen(fds[0], 5);
 	listen(fds[1], 5);
-	epfd = epoll_create(1);
-	epoll_ctl(epfd, EPOLL_CTL_ADD, fds[0], &ep_events[0]);
-	epoll_ctl(epfd, EPOLL_CTL_ADD, fds[1], &ep_events[1]);
 	while (true)
 	{
 		triggered_events = epoll_wait(epfd, ep_events, 2, 0);
@@ -65,7 +62,7 @@ int main(int argc, char **argv)
 			{
 				recv(client_socket, buf, sizeof(buf), 0);
 				std::cout << "Message from client:" << std::endl << buf;
-				send(client_socket, "SALUT\n", 6, 0);
+				send(client_socket, "Hello world\n", 13, 0);
 			}
 		}
 	}
