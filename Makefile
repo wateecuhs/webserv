@@ -6,26 +6,30 @@
 #    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/07/11 13:04:03 by panger           ###   ########.fr        #
+#    Updated: 2024/07/22 10:57:50 by panger           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CC			=	c++
 
-HEADERS		=	
+HEADERS		=	parsing.hpp								\
+				Server.hpp
 
-SOURCES		=	main.cpp
+RAW_SOURCES	=	main.cpp								\
+				parsing/parsing.cpp
 
 
 OBJ_DIR		=	.build
-SRC_DIR		=	src
+SRC_DIR		=	src/
+INC_DIR		=	includes/
 
-CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP
+CPPFLAGS	=	-Wall -Wextra -Werror -std=c++98 -MMD -MP
 
-SRCS	=	$(addprefix $(SRC_DIR)/, $(SOURCES))
-OBJECTS	=	$(addprefix $(OBJ_DIR)/, $(SRCS:.cpp=.o))
-DEPS	=	$(addprefix $(OBJ_DIR)/, $(SOURCES:.cpp=.d))
+SRCS		=	$(addprefix $(SRC_DIR), $(RAW_SOURCES))
+INCLUDES	=	$(addprefix $(INC_DIR), $(HEADERS))
+OBJECTS		=	$(addprefix $(OBJ_DIR)/, $(RAW_SOURCES:.cpp=.o))
+DEPS		=	$(addprefix $(OBJ_DIR)/, $(RAW_SOURCES:.cpp=.d))
 
 .DEFAULT_GOAL = all
 
@@ -37,9 +41,9 @@ all:
 $(NAME): $(OBJECTS)
 	$(CC) $(CPPFLAGS) $^ -o $@
 
-$(OBJ_DIR)/%.o: %.cpp $(HEADERS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)%.cpp
 	mkdir -p $(dir $@)
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS)  -c $< -I $(INC_DIR) -o $@
 
 re: fclean all
 
