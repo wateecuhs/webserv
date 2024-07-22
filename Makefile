@@ -6,7 +6,7 @@
 #    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/07/22 10:57:50 by panger           ###   ########.fr        #
+#    Updated: 2024/07/22 17:37:49 by panger           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,10 +14,13 @@ NAME		=	webserv
 CC			=	c++
 
 HEADERS		=	parsing.hpp								\
-				Server.hpp
+				Server.hpp								\
+				enums.hpp								\
+				Request.hpp
 
 RAW_SOURCES	=	main.cpp								\
-				parsing/parsing.cpp
+				parsing/parsing.cpp						\
+				Request.cpp
 
 
 OBJ_DIR		=	.build

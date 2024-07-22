@@ -1,20 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   enums.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/08 10:35:30 by panger            #+#    #+#             */
-/*   Updated: 2024/07/08 10:40:06 by panger           ###   ########.fr       */
+/*   Created: 2024/07/22 17:27:18 by panger            #+#    #+#             */
+/*   Updated: 2024/07/22 17:29:59 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#ifndef ENUMS_HPP
+# define ENUMS_HPP
 
-Server::Server(): port(8000) {}
+typedef enum  e_methods{
+	GET,
+	POST,
+	DELETE
+} methods;
 
-Server::Server(int port): port(port) {}
-
-Server::~Server() {}
-
+#endif
