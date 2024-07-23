@@ -6,13 +6,15 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/22 16:07:07 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/23 14:52:35 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include "parsing.hpp"
+#include "Request.hpp"
 #include <netinet/in.h>
+#include <unistd.h>
 #include <poll.h>
 #include <sys/epoll.h>
 
@@ -23,6 +25,7 @@ int	init_socket(int epfd, unsigned int port, epoll_event &ep_event)
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
+	std::cout << "Port: " << server_addr.sin_port << " from input: " << port << std::endl;
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 
 	bind(socketfd, (sockaddr *)&server_addr, sizeof(server_addr));
@@ -61,8 +64,13 @@ int main(int argc, char **argv)
 			if (client_socket != -1)
 			{
 				recv(client_socket, buf, sizeof(buf), 0);
-				std::cout << "Message from client:" << std::endl << buf;
-				send(client_socket, "Hello world\n", 13, 0);
+				try {
+					Request rq(buf);
+				}
+				catch (const std::exception &e) {
+					close(client_socket);
+					std::cout << e.what() << std::endl;
+				}
 			}
 		}
 	}
