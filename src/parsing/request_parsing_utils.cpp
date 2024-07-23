@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/23 15:43:56 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/23 15:51:04 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,7 @@
 #include <sstream>
 #include <string>
 
-// Methods get_method(std::string r)
-// {
-// 	std::string methods_list[] = {"GET", "POST", "DELETE"};
-// 	Methods enums_list[] = {GET, POST, DELETE};
-
-// 	std::istringstream iss(r);
-// 	std::string method;
-
-// 	iss >> method;
-// 	if (!isupper(*r.begin()))
-// 		throw BadRequest();
-// 	for (int i = 0; i < 3; i++)
-// 	{
-// 		if (method == methods_list[i])
-// 			return (enums_list[i]);
-// 	}
-// 	throw BadRequest();
-// }
-
-Methods get_method(std::string r, State &state, int len)
+Methods parse_method(std::string r, State &state, int len)
 {
 	if (r.compare(0, 3, "GET"))
 		return GET;
@@ -44,9 +25,8 @@ Methods get_method(std::string r, State &state, int len)
 	throw BadRequest();
 }
 
-std::string get_uri(std::string r)
+std::string parse_uri(std::string r, State &state, int len)
 {
-	
 }
 
 void parse_request_line(std::string r, Request &request)
@@ -67,7 +47,7 @@ void parse_request_line(std::string r, Request &request)
 				break;
 			case req_method:
 				if (*it == ' ') {
-					request._method = get_method(r, state, it - cur_begin);
+					request.setMethod(parse_method(r, state, it - cur_begin));
 					state = req_after_method;
 				}
 				break;
@@ -82,7 +62,9 @@ void parse_request_line(std::string r, Request &request)
 				cur_begin = it;
 			case req_uri:
 				if (*it == ' ')
-					
+				{
+					parse_uri(r, state, it - cur_begin); // wont work right now
+				}
 		}
 	}
 }

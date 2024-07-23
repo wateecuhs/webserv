@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/23 11:07:01 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/23 15:58:46 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,16 @@ class Request {
 		Request(Request &src);
 		Request(std::string request);
 		~Request();
-		
+		Methods								getMethod() const;
+		void								setMethod(Methods method);
+		std::string							getPath() const;
+		float								getHTTPVersion() const;
+		std::map<std::string, std::string>	getHeaders() const;
+		std::string							getBody() const;
+
+		unsigned int						getPort() const;
+		unsigned long						getHost() const;
+
 };
 
 class BadRequest: public std::exception {
@@ -43,4 +52,5 @@ class BadRequest: public std::exception {
 			return "400: Bad Request";
 		}
 };
+
 #endif
