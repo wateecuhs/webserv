@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/22 17:35:08 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/23 14:44:55 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,16 @@ class Request {
 		Request(Request &src);
 		Request(std::string request);
 		~Request();
+
+		methods								getMethod() const;
+		std::string							getPath() const;
+		float								getHTTPVersion() const;
+		std::map<std::string, std::string>	getHeaders() const;
+		std::string							getBody() const;
+
+		unsigned int						getPort() const;
+		unsigned long						getHost() const;
+
 };
 
 #endif
