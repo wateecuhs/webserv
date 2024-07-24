@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/07/22 16:26:18 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/24 10:47:00 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,12 @@
 # define PARSING_H
 
 #include "Server.hpp"
+#include "enums.hpp"
 #include <iostream>
 #include <fstream>
+#include "Request.hpp"
 
-Server *parse_config(std::string conf_path);
+Server	*parse_config(std::string conf_path);
+void parse_request_line(std::string r, Request &request);
 
 #endif
