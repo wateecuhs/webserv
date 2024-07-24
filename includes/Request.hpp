@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/23 15:58:46 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/24 14:51:38 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@ class Request {
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 
-		unsigned int						_port;
-		unsigned long						_host;
+		std::string							_host;
 
 		Request();
 	public:
@@ -37,12 +36,17 @@ class Request {
 		Methods								getMethod() const;
 		void								setMethod(Methods method);
 		std::string							getPath() const;
+		void								setPath(std::string path);
+		void								setHTTPVersion(float version);
 		float								getHTTPVersion() const;
+		void								addHeader(std::string key, std::string value);
+		void								setHeaders(std::map<std::string, std::string>);
 		std::map<std::string, std::string>	getHeaders() const;
+		void								setBody(std::string body);
 		std::string							getBody() const;
 
-		unsigned int						getPort() const;
-		unsigned long						getHost() const;
+		void								setHost(std::string host);
+		std::string						getHost() const;
 
 };
 

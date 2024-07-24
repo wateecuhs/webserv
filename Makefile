@@ -6,7 +6,7 @@
 #    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/07/23 11:19:44 by panger           ###   ########.fr        #
+#    Updated: 2024/07/24 10:51:16 by panger           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ OBJ_DIR		=	.build
 SRC_DIR		=	src/
 INC_DIR		=	includes/
 
-CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP #-Werror
+CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP -g3 #-Werror
 
 SRCS		=	$(addprefix $(SRC_DIR), $(RAW_SOURCES))
 INCLUDES	=	$(addprefix $(INC_DIR), $(HEADERS))

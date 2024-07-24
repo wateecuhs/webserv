@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/23 15:59:28 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/24 14:52:13 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,9 @@ Request::Request(std::string request)
 {
 	parse_request_line(request, *this);
 	std::cout << "Method found -> " << this->_method << std::endl;
+	std::cout << "Path found -> " << this->_path << std::endl;
+	std::cout << "Version found -> " << this->_http_version << std::endl;
+	std::cout << std::endl;
 }
 
 Request::Request(Request &src)
@@ -40,9 +43,19 @@ Methods Request::getMethod() const
 	return this->_method;
 }
 
+void Request::setPath(std::string path)
+{
+	this->_path = path;
+}
+
 std::string Request::getPath() const
 {
 	return this->_path;
+}
+
+void Request::setHTTPVersion(float version)
+{
+	this->_http_version = version;
 }
 
 float Request::getHTTPVersion() const
@@ -50,9 +63,24 @@ float Request::getHTTPVersion() const
 	return this->_http_version;
 }
 
+void Request::addHeader(std::string key, std::string value)
+{
+	this->_headers[key] = value;
+}
+
+void Request::setHeaders(std::map<std::string, std::string> headers)
+{
+	this->_headers = headers;
+}
+
 std::map<std::string, std::string>	Request::getHeaders() const
 {
 	return this->_headers;
+}
+
+void Request::setBody(std::string body)
+{
+	this->_body = body;
 }
 
 std::string Request::getBody() const
@@ -60,12 +88,12 @@ std::string Request::getBody() const
 	return this->_body;
 }
 
-unsigned int Request::getPort() const
+void Request::setHost(std::string host)
 {
-	return this->_port;
+	this->_host = host;
 }
 
-unsigned long Request::getHost() const
+std::string Request::getHost() const
 {
 	return this->_host;
 }

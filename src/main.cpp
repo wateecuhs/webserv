@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/23 14:52:35 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/24 14:46:19 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,27 @@
 #include <unistd.h>
 #include <poll.h>
 #include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 int	init_socket(int epfd, unsigned int port, epoll_event &ep_event)
 {
 	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
+	// Supposed to make the socket reusable instantly after the program closes but doesnt work
+	setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (void *)1, 1);
+
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
-	std::cout << "Port: " << server_addr.sin_port << " from input: " << port << std::endl;
-	server_addr.sin_addr.s_addr = INADDR_ANY;
+	inet_aton("127.0.0.1", &server_addr.sin_addr);
 
 	bind(socketfd, (sockaddr *)&server_addr, sizeof(server_addr));
+
 	ep_event.data.fd = socketfd;
 	ep_event.events = EPOLLIN | EPOLLPRI;
 	epoll_ctl(epfd, EPOLL_CTL_ADD, socketfd, &ep_event);
+
 	return (socketfd);
 }
 
@@ -58,13 +64,12 @@ int main(int argc, char **argv)
 		{
 			client_socket = -1;
 			for (int i = 0; i < triggered_events; i++)
-			{
 				client_socket = accept(ep_events[i].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
-			}
 			if (client_socket != -1)
 			{
 				recv(client_socket, buf, sizeof(buf), 0);
 				try {
+					std::cout << std::endl << buf << std::endl;
 					Request rq(buf);
 				}
 				catch (const std::exception &e) {
