@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/24 14:51:38 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/24 15:12:08 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,7 @@ class Request {
 
 class BadRequest: public std::exception {
 	public:
-		virtual const char *what() const throw() {
-			return "400: Bad Request";
-		}
+		virtual const char *what() const throw();
 };
 
 #endif
