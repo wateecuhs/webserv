@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
+#    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/07/24 10:51:16 by panger           ###   ########.fr        #
+#    Updated: 2024/07/25 17:15:50 by alermolo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,8 @@ HEADERS		=	parsing.hpp								\
 RAW_SOURCES	=	main.cpp								\
 				parsing/parsing.cpp						\
 				Request.cpp								\
-				parsing/request_parsing_utils.cpp
+				parsing/request_parsing_utils.cpp		\
+				method_handler.cpp
 
 
 OBJ_DIR		=	.build
