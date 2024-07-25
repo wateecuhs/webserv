@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/25 16:37:18 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/25 17:33:35 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Request {
 
 		std::string							_host;
 
-		int									_socket;
+		// int									_socket;
 
 		Request();
 	public:
@@ -50,8 +50,8 @@ class Request {
 		void								setHost(std::string host);
 		std::string							getHost() const;
 
-		void								setSocket(int socket);
-		int									getSocket() const;
+		// void								setSocket(int socket);
+		// int									getSocket() const;
 
 };
 

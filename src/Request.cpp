@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/25 16:37:34 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/25 17:33:42 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,15 +98,15 @@ std::string Request::getHost() const
 	return this->_host;
 }
 
-void Request::setSocket(int socket)
-{
-	this->_socket = socket;
-}
+// void Request::setSocket(int socket)
+// {
+// 	this->_socket = socket;
+// }
 
-int Request::getSocket() const
-{
-	return this->_socket;
-}
+// int Request::getSocket() const
+// {
+// 	return this->_socket;
+// }
 
 const char *BadRequest::what() const throw()
 {
