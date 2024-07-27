@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/25 17:34:56 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/25 17:41:43 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
 
 void methodHandler(const Request& request, int socket);
 
@@ -76,6 +77,7 @@ int main(int argc, char **argv)
 					methodHandler(rq, client_socket);
 				}
 				catch (const std::exception &e) {
+					send(client_socket, e.what(), strlen(e.what()), 0);
 					close(client_socket);
 					std::cout << e.what() << std::endl;
 				}

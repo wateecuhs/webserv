@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/25 17:33:42 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/27 15:35:05 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "parsing.hpp"
 #include <sstream>
 #include <cstring>
+#include <sys/stat.h>
 
 Request::Request() {}
 
@@ -23,6 +24,7 @@ Request::Request(std::string request)
 	std::cout << "Method found -> " << this->_method << std::endl;
 	std::cout << "Path found -> " << this->_path << std::endl;
 	std::cout << "Version found -> " << this->_http_version << std::endl;
+	std::cout << "Body found -> " << this->_body << std::endl;
 	std::cout << std::endl;
 }
 
@@ -46,6 +48,21 @@ Methods Request::getMethod() const
 void Request::setPath(std::string path)
 {
 	this->_path = path;
+	this->_pathIsDirectory = false;
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0)
+	{
+		if (s.st_mode & S_IFDIR)
+			this->_pathIsDirectory = true;
+		else
+			this->_pathIsDirectory = false;
+	}
+}
+
+bool Request::pathIsDirectory() const
+{
+	return this->_pathIsDirectory;
 }
 
 std::string Request::getPath() const

@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/25 17:33:35 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/27 15:34:42 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Request {
 	private:
 		Methods								_method;
 		std::string							_path;
+		bool								_pathIsDirectory;
 		float								_http_version;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
@@ -49,6 +50,8 @@ class Request {
 
 		void								setHost(std::string host);
 		std::string							getHost() const;
+
+		bool								pathIsDirectory() const;
 
 		// void								setSocket(int socket);
 		// int									getSocket() const;

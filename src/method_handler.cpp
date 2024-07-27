@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/25 17:35:50 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/27 15:35:25 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,33 @@ class InternalServerError500: public std::exception {
 
 void handleGetRequest(const Request& request, int socket) {
 	std::string path = request.getPath();
-	std::ifstream file(path.c_str());
+	std::stringstream ss;
 
+	// if (!file){
+	if (request.pathIsDirectory()){
+		std::string indexPath = path + "/index";
+		std::string extensions[] = {".html", ".php", ".xml"}; // Add more extensions if needed
+		for (size_t i = 0; i < extensions->size(); i++) {
+			std::ifstream indexFile((indexPath + extensions[i]).c_str());
+			if (indexFile) {
+				std::string content((std::istreambuf_iterator<char>(indexFile)),
+									std::istreambuf_iterator<char>());
+				ss << content.size();
+				std::string size = ss.str();
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+				send(socket, response.c_str(), response.size(), 0);
+				indexFile.close();
+				return;
+			}
+		}
+	}
+
+	std::ifstream file(path.c_str());
 	if (!file){
 		file.close();
 		throw NotFound404();
 	}
+
 	if (access(path.c_str(), R_OK) == -1){
 		file.close();
 		throw Forbidden403();
@@ -53,7 +74,6 @@ void handleGetRequest(const Request& request, int socket) {
 
 	std::string content((std::istreambuf_iterator<char>(file)),
 						 std::istreambuf_iterator<char>());
-	std::stringstream ss;
 	ss << content.size();
 	std::string size = ss.str();
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
