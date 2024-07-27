@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/27 15:35:25 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/27 16:23:35 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void handleGetRequest(const Request& request, int socket) {
 	// if (!file){
 	if (request.pathIsDirectory()){
 		std::string indexPath = path + "/index";
-		std::string extensions[] = {".html", ".php", ".xml"}; // Add more extensions if needed
+		std::string extensions[] = {".html", ".php", ".xml"};
 		for (size_t i = 0; i < extensions->size(); i++) {
 			std::ifstream indexFile((indexPath + extensions[i]).c_str());
 			if (indexFile) {
@@ -84,10 +84,12 @@ void handleGetRequest(const Request& request, int socket) {
 
 void handlePostRequest(const Request& request, int socket) {
 	std::string path = request.getPath();
-	std::ofstream file(path.c_str(), std::ios::out | std::ios::app); // Open file in append mode
+	if (request.pathIsDirectory())
+		path += "/uploadedData.txt";
+	std::ofstream file(path.c_str(), std::ios::out | std::ios::app);
 
 	if (!file){
-		file.open(path.c_str(), std::ios::out | std::ios::trunc); // Create file if it doesn't exist
+		file.open(path.c_str(), std::ios::out | std::ios::trunc);
 		if (!file){
 			file.close();
 			throw InternalServerError500();
@@ -119,6 +121,14 @@ void handlePostRequest(const Request& request, int socket) {
 	file.close();
 }
 
+void	handleDeleteRequest(const Request& request, int socket) {
+	std::string path = request.getPath();
+	if (remove(path.c_str()) != 0)
+		throw NotFound404();
+	std::string response = "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n";
+	send(socket, response.c_str(), response.size(), 0);
+}
+
 void methodHandler(const Request& request, int socket) {
 	switch (request.getMethod()) {
 		case GET:
@@ -126,6 +136,9 @@ void methodHandler(const Request& request, int socket) {
 			break;
 		case POST:
 			handlePostRequest(request, socket);
+			break;
+		case DELETE:
+			handleDeleteRequest(request, socket);
 			break;
 		default:
 			throw BadRequest();
