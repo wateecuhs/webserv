@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/29 14:42:38 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/29 15:14:16 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void handlePostRequest(const Request &request, int socket) {
 		throw Forbidden403();
 	}
 
-	std::string body = request.getBody();
+	std::string body = request.getBody() + "\n";
 	file << body;
 	std::stringstream ss;
 	ss << body.size();
