@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/27 16:23:35 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/29 14:07:37 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,10 @@ class InternalServerError500: public std::exception {
 		}
 };
 
-void handleGetRequest(const Request& request, int socket) {
+void handleGetRequest(const Request &request, int socket) {
 	std::string path = request.getPath();
 	std::stringstream ss;
 
-	// if (!file){
 	if (request.pathIsDirectory()){
 		std::string indexPath = path + "/index";
 		std::string extensions[] = {".html", ".php", ".xml"};
@@ -59,6 +58,7 @@ void handleGetRequest(const Request& request, int socket) {
 				return;
 			}
 		}
+		throw NotFound404();
 	}
 
 	std::ifstream file(path.c_str());
@@ -78,11 +78,10 @@ void handleGetRequest(const Request& request, int socket) {
 	std::string size = ss.str();
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
 	send(socket, response.c_str(), response.size(), 0);
-	// std::cout << response;
 	file.close();
 }
 
-void handlePostRequest(const Request& request, int socket) {
+void handlePostRequest(const Request &request, int socket) {
 	std::string path = request.getPath();
 	if (request.pathIsDirectory())
 		path += "/uploadedData.txt";
@@ -117,11 +116,10 @@ void handlePostRequest(const Request& request, int socket) {
 
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + body;
 	send(socket, response.c_str(), response.size(), 0);
-	// std::cout << response;
 	file.close();
 }
 
-void	handleDeleteRequest(const Request& request, int socket) {
+void	handleDeleteRequest(const Request &request, int socket) {
 	std::string path = request.getPath();
 	if (remove(path.c_str()) != 0)
 		throw NotFound404();
