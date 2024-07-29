@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:25:24 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:30:43 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 void methodHandler(const Request& request, int socket);
 
-int	init_socket(int epfd, unsigned int port, epoll_event &ep_event)
+int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 {
 	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 	int			triggered_events;
 
 	epfd = epoll_create(1);
-	fds[0] = init_socket(epfd, 3000, ep_events[0]);
-	fds[1] = init_socket(epfd, 8000, ep_events[1]);
+	fds[0] = initSocket(epfd, 3000, ep_events[0]);
+	fds[1] = initSocket(epfd, 8000, ep_events[1]);
 	listen(fds[0], 5);
 	listen(fds[1], 5);
 	while (true)

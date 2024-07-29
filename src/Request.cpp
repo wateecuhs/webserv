@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:25:12 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:31:34 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ Request::Request(std::string request)
 	headers_start = request.find("\r\n");
 	if (headers_start == std::string::npos)
 		throw BadRequest();
-	parse_request_line(request.substr(0, headers_start), *this);
+	parseRequestLine(request.substr(0, headers_start), *this);
 
 	std::cout << "Method found -> " << this->_method << std::endl;
 	std::cout << "Path found -> " << this->_path << std::endl;
@@ -35,7 +35,7 @@ Request::Request(std::string request)
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
 		throw BadRequest();
-	parse_headers(request.substr(headers_start, headers_end), *this);
+	parseHeaders(request.substr(headers_start, headers_end), *this);
 
 	std::cout << "Headers found -> " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); it++)

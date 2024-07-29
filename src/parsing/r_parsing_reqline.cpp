@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:23:54 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:32:13 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <cstdlib>
 
 
-Methods parse_method(std::string r, int len)
+Methods parseMethod(std::string r, int len)
 {
 	switch (len) {
 		case 3:
@@ -36,7 +36,7 @@ Methods parse_method(std::string r, int len)
 	}
 }
 
-float parse_version(std::string r, int pos)
+float parseVersion(std::string r, int pos)
 {
 	float version;
 
@@ -50,19 +50,19 @@ float parse_version(std::string r, int pos)
 	return version;
 }
 
-std::string parse_uri(std::string r, int pos, int len)
+std::string parseURI(std::string r, int pos, int len)
 {
 	return r.substr(pos, len);
 }
 
-bool is_http(std::string r, int pos, int len)
+bool isHTTP(std::string r, int pos, int len)
 {
 	if (r.compare(pos, len, "HTTP/") == 0)
 		return true;
 	return false;
 }
 
-void parse_request_line(std::string r, Request &request)
+void parseRequestLine(std::string r, Request &request)
 {
 	State state = req_start;
 	std::string::iterator cur_begin;
@@ -80,7 +80,7 @@ void parse_request_line(std::string r, Request &request)
 				break;
 			case req_method:
 				if (*it == ' ') {
-					request.setMethod(parse_method(r, it - cur_begin));
+					request.setMethod(parseMethod(r, it - cur_begin));
 					state = req_after_method;
 				}
 				break;
@@ -94,7 +94,7 @@ void parse_request_line(std::string r, Request &request)
 					throw BadRequest();
 			case req_uri:
 				if (*it == ' ') {
-					request.setPath(parse_uri(r, cur_begin - r.begin(), it - cur_begin));
+					request.setPath(parseURI(r, cur_begin - r.begin(), it - cur_begin));
 					state = req_after_uri;
 				}
 				break;
@@ -109,14 +109,14 @@ void parse_request_line(std::string r, Request &request)
 				if (*it == 'T' || *it == 'P')
 					break;
 				if (*it == '/') {
-					if (!is_http(r, cur_begin - r.begin(), it - cur_begin + 1))
+					if (!isHTTP(r, cur_begin - r.begin(), it - cur_begin + 1))
 						throw BadRequest();
 					state = req_http_version;
 					break;
 				}
 				throw BadRequest();
 			case req_http_version:
-				request.setHTTPVersion(parse_version(r, it - r.begin()));
+				request.setHTTPVersion(parseVersion(r, it - r.begin()));
 				state = req_after_version;
 				it++;
 				it++;

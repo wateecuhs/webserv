@@ -6,13 +6,13 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/29 11:22:56 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 12:07:51 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:31:21 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-void parse_headers(std::string headers, Request &req)
+void parseHeaders(std::string headers, Request &req)
 {
 	size_t start = 0;
 	size_t end = headers.find("\r\n");
