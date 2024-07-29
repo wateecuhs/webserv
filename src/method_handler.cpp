@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/29 14:07:37 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/29 14:42:38 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void handleGetRequest(const Request &request, int socket) {
 	if (request.pathIsDirectory()){
 		std::string indexPath = path + "/index";
 		std::string extensions[] = {".html", ".php", ".xml"};
-		for (size_t i = 0; i < extensions->size(); i++) {
+		for (size_t i = 0; i < 3; i++) {
 			std::ifstream indexFile((indexPath + extensions[i]).c_str());
 			if (indexFile) {
 				std::string content((std::istreambuf_iterator<char>(indexFile)),
