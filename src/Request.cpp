@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/24 14:52:13 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 12:13:46 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,28 @@ Request::Request() {}
 
 Request::Request(std::string request)
 {
-	parse_request_line(request, *this);
+	size_t headers_start;
+	size_t headers_end;
+	headers_start = request.find("\r\n");
+	if (headers_start == std::string::npos)
+		throw BadRequest();
+	parse_request_line(request.substr(0, headers_start), *this);
+
 	std::cout << "Method found -> " << this->_method << std::endl;
 	std::cout << "Path found -> " << this->_path << std::endl;
 	std::cout << "Version found -> " << this->_http_version << std::endl;
-	std::cout << std::endl;
+	
+	headers_start += 2;
+	headers_end = request.find("\r\n\r\n");
+	if (headers_start == std::string::npos || headers_end == std::string::npos)
+		throw BadRequest();
+	parse_headers(request.substr(headers_start, headers_end), *this);
+
+	std::cout << "Headers found -> " << std::endl;
+	for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); it++)
+		std::cout << it->first << ": " << it->second << std::endl;
+	setHost(this->_headers["Host"]);
+	setBody(request.substr(headers_end + 4));
 }
 
 Request::Request(Request &src)

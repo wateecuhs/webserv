@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   request_parsing_utils.cpp                          :+:      :+:    :+:   */
+/*   r_parsing_reqline.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/24 14:44:08 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:19:41 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void parse_request_line(std::string r, Request &request)
 					cur_begin = it;
 					break;
 				}
-				else if (*it == ' ')
+				else
 					throw BadRequest();
 			case req_uri:
 				if (*it == ' ') {
@@ -118,6 +118,13 @@ void parse_request_line(std::string r, Request &request)
 			case req_http_version:
 				request.setHTTPVersion(parse_version(r, it - r.begin()));
 				state = req_after_version;
+				it++;
+				it++;
+				break;
+			case req_after_version:
+				if (*it == '\r' && *(it + 1) == '\n')
+					return;
+				throw BadRequest();
 			default:
 				break;
 		}

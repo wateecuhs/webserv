@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/24 14:51:38 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 11:02:27 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class Request {
 		std::string							getBody() const;
 
 		void								setHost(std::string host);
-		std::string						getHost() const;
+		std::string							getHost() const;
 
 };
 
