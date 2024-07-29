@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:30:43 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:37:23 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	// Supposed to make the socket reusable instantly after the program closes but doesnt work
-	setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (void *)1, 1);
+	// setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (void *)1, 1);
 
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
