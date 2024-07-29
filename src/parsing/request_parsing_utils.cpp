@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request_parsing_utils.cpp                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/24 14:44:08 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/27 15:27:04 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void parse_request_line(std::string r, Request &request)
 					break;
 				if (*it < 'A' || *it > 'Z')
 					throw BadRequest();
-				state = req_method;
+				state = req_method;							//au fait ça (+ break) sert à quoi si de toute façon on passe à la suite avec switch ?
 				cur_begin = it;
 				break;
 			case req_method:
