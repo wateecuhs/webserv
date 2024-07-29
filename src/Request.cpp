@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 12:13:46 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:25:12 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "parsing.hpp"
 #include <sstream>
 #include <cstring>
+#include <sys/stat.h>
 
 Request::Request() {}
 
@@ -63,6 +64,21 @@ Methods Request::getMethod() const
 void Request::setPath(std::string path)
 {
 	this->_path = path;
+	this->_pathIsDirectory = false;
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0)
+	{
+		if (s.st_mode & S_IFDIR)
+			this->_pathIsDirectory = true;
+		else
+			this->_pathIsDirectory = false;
+	}
+}
+
+bool Request::pathIsDirectory() const
+{
+	return this->_pathIsDirectory;
 }
 
 std::string Request::getPath() const
@@ -113,4 +129,9 @@ void Request::setHost(std::string host)
 std::string Request::getHost() const
 {
 	return this->_host;
+}
+
+const char *BadRequest::what() const throw()
+{
+	return "400: Bad Request";
 }

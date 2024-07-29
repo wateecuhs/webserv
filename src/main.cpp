@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 11:38:49 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/29 14:25:24 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <cstring>
+
+void methodHandler(const Request& request, int socket);
 
 int	init_socket(int epfd, unsigned int port, epoll_event &ep_event)
 {
@@ -46,7 +49,7 @@ int main(int argc, char **argv)
 	(void)argv, (void)argc;
 
 	int			fds[2];
-	char		buf[2048];
+	char		buf[2048] = {0};
 	int			client_socket;
 	int			epfd;
 	epoll_event	ep_events[2];
@@ -71,8 +74,10 @@ int main(int argc, char **argv)
 				try {
 					std::cout << std::endl << buf << std::endl;
 					Request rq(buf);
+					methodHandler(rq, client_socket);
 				}
 				catch (const std::exception &e) {
+					send(client_socket, e.what(), strlen(e.what()), 0);
 					close(client_socket);
 					std::cout << e.what() << std::endl;
 				}
