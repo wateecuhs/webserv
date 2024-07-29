@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/27 15:34:42 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/29 14:22:21 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,9 @@ class Request {
 		std::string							_path;
 		bool								_pathIsDirectory;
 		float								_http_version;
+		std::string							_host;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
-
-		std::string							_host;
-
-		// int									_socket;
 
 		Request();
 	public:
@@ -47,15 +44,10 @@ class Request {
 		std::map<std::string, std::string>	getHeaders() const;
 		void								setBody(std::string body);
 		std::string							getBody() const;
-
 		void								setHost(std::string host);
 		std::string							getHost() const;
 
 		bool								pathIsDirectory() const;
-
-		// void								setSocket(int socket);
-		// int									getSocket() const;
-
 };
 
 class BadRequest: public std::exception {

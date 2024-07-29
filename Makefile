@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
+#    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/07/25 17:15:50 by alermolo         ###   ########.fr        #
+#    Updated: 2024/07/29 14:24:57 by panger           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,8 @@ HEADERS		=	parsing.hpp								\
 RAW_SOURCES	=	main.cpp								\
 				parsing/parsing.cpp						\
 				Request.cpp								\
-				parsing/request_parsing_utils.cpp		\
+				parsing/r_parsing_reqline.cpp			\
+				parsing/r_parsing_headers.cpp			\
 				method_handler.cpp
 
 
