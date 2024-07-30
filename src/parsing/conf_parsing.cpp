@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:22:31 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 13:01:09 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/30 14:28:23 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class InvalidConfigFile: public std::exception {
 
 
 
-Server *parseConfig(std::string conf_path)
+Socket *parseConfig(std::string conf_path)
 {
 	std::ifstream	cfstream;
 	// char			buf[2048];

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 14:12:08 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/30 14:36:58 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@
 class Socket
 {
 	private:
-		int									port;
+		int									fd;
 		unsigned long						host;
+		int									port;
 		bool								useCGI;
 		std::map<std::string, std::string>	cgi_extensions;
+
 	public:
 		Socket();
 		Socket(int port);
