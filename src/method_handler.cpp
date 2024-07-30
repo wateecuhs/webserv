@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/29 15:14:16 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/30 16:29:20 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ void handlePostRequest(const Request &request, int socket) {
 
 void	handleDeleteRequest(const Request &request, int socket) {
 	std::string path = request.getPath();
-	if (remove(path.c_str()) != 0)
+	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
 	std::string response = "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n";
 	send(socket, response.c_str(), response.size(), 0);
