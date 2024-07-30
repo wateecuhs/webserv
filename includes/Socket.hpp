@@ -6,12 +6,12 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 13:07:34 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/30 14:12:08 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef SOCKET_HPP
+# define SOCKET_HPP
 
 #include <string>
 #include <map>
