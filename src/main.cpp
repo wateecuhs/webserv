@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:37:23 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/30 11:36:41 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,6 @@ int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 {
 	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	// Supposed to make the socket reusable instantly after the program closes but doesnt work
-	// setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (void *)1, 1);
-
 	sockaddr_in server_addr;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
@@ -46,10 +43,13 @@ int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 
 int main(int argc, char **argv)
 {
+	parseConfig("config_tests/test1.config");
+	return 0;
 	(void)argv, (void)argc;
 
 	int			fds[2];
 	char		buf[2048] = {0};
+	int			len;
 	int			client_socket;
 	int			epfd;
 	epoll_event	ep_events[2];
@@ -70,7 +70,8 @@ int main(int argc, char **argv)
 				client_socket = accept(ep_events[i].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
 			if (client_socket != -1)
 			{
-				recv(client_socket, buf, sizeof(buf), 0);
+				len = recv(client_socket, buf, sizeof(buf), 0);
+				buf[len] = 0;
 				try {
 					std::cout << std::endl << buf << std::endl;
 					Request rq(buf);
