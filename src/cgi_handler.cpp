@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/30 17:34:18 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/31 13:22:09 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,14 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <cstdlib>
+#include <sstream>
 
-class InternalServerError500;
+class InternalServerError500: public std::exception {
+	public:
+		virtual const char *what() const throw() {
+			return "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
+		}
+};
 
 class BadGateway502: public std::exception {
 	public:
@@ -26,8 +32,6 @@ class BadGateway502: public std::exception {
 			return "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n";
 		}
 };
-
-
 
 void	handleCGI(const Request &request, const Socket &socket)
 {
@@ -59,11 +63,19 @@ void	handleCGI(const Request &request, const Socket &socket)
 	else
 	{
 		close(pipefd[1]);
-		char 	buffer[2048];
-		int 	bytes_read;
+		char 				buffer[2048];
+		int 				bytes_read;
+		std::stringstream 	ss;
+
 		while ((bytes_read = read(pipefd[0], buffer, 2048)) > 0)
-			send(socket.getFD(), buffer, bytes_read, 0);
+			ss << buffer;
+		if (bytes_read == -1)
+			throw BadGateway502();
+
 		close(pipefd[0]);
 		waitpid(pid, NULL, 0);
+
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(ss.str().length()) + "\r\n\r\n" + ss.str();
+		send(socket.getFd(), response.c_str(), response.size(), 0);
 	}
 }
