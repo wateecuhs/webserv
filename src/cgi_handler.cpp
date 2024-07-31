@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/31 13:22:09 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/07/31 18:00:30 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,49 +33,89 @@ class BadGateway502: public std::exception {
 		}
 };
 
-void	handleCGI(const Request &request, const Socket &socket)
+std::string	execCGI(const Request &request, const Socket &socket)
 {
 	std::string	request_method = "REQUEST_METHOD=" + request.getMethod();
 	std::string	query_string = "QUERY_STRING=" + request.getQuery();
 	std::string	content_length = "CONTENT_LENGTH=" + request.getBody().size();
 	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.') + 1);
+	std::string cgi_handler = socket.getCgiHandler(extension);
+
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
-	const char 	*argv[2] = {request.getPath().c_str(), NULL};
+	const char 	*argv[3] = {cgi_handler.c_str(), request.getPath().c_str(), NULL};
 
 	pid_t 	pid;
-	int 	pipefd[2];
+	int 	pipe_out[2];
+	int 	pipe_in[2];
+	int 	status = 0;
 
-	if (pipe(pipefd) == -1)
+	if (pipe(pipe_out) == -1 || pipe(pipe_in) == -1)
 		throw InternalServerError500();
 	pid = fork();
 	if (pid == -1)
 		throw InternalServerError500();
 	if (pid == 0)
 	{
-		close(pipefd[0]);
-		dup2(pipefd[1], STDOUT_FILENO);
-		close(pipefd[1]);
-		if (execve(request.getPath().c_str(), (char *const *)argv, (char *const *)env) == -1)
+		close(pipe_out[0]);
+		close(pipe_in[1]);
+		if (dup2(pipe_out[1], STDOUT_FILENO) == -1 || dup2(pipe_in[0], STDIN_FILENO) == -1)
+			throw InternalServerError500();
+		close(pipe_out[1]);
+		close(pipe_in[0]);
+
+		if (access(cgi_handler.c_str(), X_OK) == -1)
+			throw BadGateway502();
+		if (execve(const_cast<const char*>(cgi_handler.c_str()), const_cast<char* const*>(argv), const_cast<char* const*>(env)) == -1)
 			throw BadGateway502();
 		std::exit(EXIT_SUCCESS);
 	}
 	else
 	{
-		close(pipefd[1]);
+		close(pipe_out[1]);
+		close(pipe_in[0]);
+
+		//put request body into pipe for cgi handler to read
+		write(pipe_in[1], request.getBody().c_str(), request.getBody().size());
+		close(pipe_in[1]);
+
 		char 				buffer[2048];
 		int 				bytes_read;
 		std::stringstream 	ss;
 
-		while ((bytes_read = read(pipefd[0], buffer, 2048)) > 0)
+		while ((bytes_read = read(pipe_out[0], buffer, 2048)) > 0)
 			ss << buffer;
 		if (bytes_read == -1)
 			throw BadGateway502();
 
-		close(pipefd[0]);
-		waitpid(pid, NULL, 0);
+		close(pipe_out[0]);
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			throw BadGateway502();
 
 		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(ss.str().length()) + "\r\n\r\n" + ss.str();
-		send(socket.getFd(), response.c_str(), response.size(), 0);
+		// send(socket.getFd(), response.c_str(), response.size(), 0);
+		return response;
 	}
+}
+
+void	handleCGI(const Request &request, const Socket &socket){
+	int backup_stdin = dup(STDIN_FILENO);
+	if (backup_stdin == -1)
+		throw InternalServerError500();
+	int backup_stdout = dup(STDOUT_FILENO);
+	if (backup_stdout  == -1)
+		throw InternalServerError500();
+	std::string content = execCGI(request, socket);
+	if (dup2(backup_stdin, STDIN_FILENO) || dup2(backup_stdout, STDOUT_FILENO))
+		throw InternalServerError500();
+	close(backup_stdin);
+	close(backup_stdout);
+
+	std::stringstream ss;
+	ss << content.size();
+	std::string size = ss.str();
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+	if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:31:34 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 14:04:30 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Request::Request(std::string request)
 	std::cout << "Method found -> " << this->_method << std::endl;
 	std::cout << "Path found -> " << this->_path << std::endl;
 	std::cout << "Version found -> " << this->_http_version << std::endl;
-	
+
 	headers_start += 2;
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
@@ -129,6 +129,16 @@ void Request::setHost(std::string host)
 std::string Request::getHost() const
 {
 	return this->_host;
+}
+
+void Request::setQuery(std::string query)
+{
+	this->_query = query;
+}
+
+std::string Request::getQuery() const
+{
+	return this->_query;
 }
 
 const char *BadRequest::what() const throw()

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:22:21 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 14:04:07 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Request {
 		std::string							_host;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
+		std::string							_query;
 
 		Request();
 	public:
@@ -46,6 +47,8 @@ class Request {
 		std::string							getBody() const;
 		void								setHost(std::string host);
 		std::string							getHost() const;
+		void								setQuery(std::string query);
+		std::string							getQuery() const;
 
 		bool								pathIsDirectory() const;
 };
