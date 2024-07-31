@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 14:39:11 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 13:25:36 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,27 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 class Socket
 {
 	private:
-		int									fd;
-		unsigned long						host;
-		int									port;
-		bool								useCGI;
-		std::map<std::string, std::string>	cgi_extensions;
+		int									_fd;
+		unsigned long						_host;
+		int									_port;
+		bool								_useCGI;
+		std::map<std::string, std::string>	_CGI_map;
+		std::vector<std::string>			_server_names;
 
 	public:
 		Socket();
 		Socket(int port);
 		~Socket();
+		Socket(const Socket &copy);
+		Socket &operator=(const Socket &copy);
+		void addServerName(std::string name);
+		std::vector<std::string> getServerNames() const;
+		void addCGIExtension(std::string extension, std::string path);
 };
 
 #endif
