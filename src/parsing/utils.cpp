@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.hpp                                        :+:      :+:    :+:   */
+/*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 15:00:31 by panger           ###   ########.fr       */
+/*   Created: 2024/07/30 14:47:27 by panger            #+#    #+#             */
+/*   Updated: 2024/07/30 14:59:27 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-# define PARSING_H
+#include <string>
 
-#include "Socket.hpp"
-#include "enums.hpp"
-#include <iostream>
-#include <fstream>
-#include "Request.hpp"
-
-Socket	*parseConfig(std::string conf_path);
-void	parseRequestLine(std::string r, Request &request);
-void	parseHeaders(std::string r, Request &req);
-int		inKeywords(std::string s);
-
-#endif
+int inKeywords(std::string s)
+{
+	if (!s.compare("server_name"))
+		return 1;
+	if (!s.compare("listen"))
+		return 2;
+	if (!s.compare("location"))
+		return 3;
+	return 0;
+}

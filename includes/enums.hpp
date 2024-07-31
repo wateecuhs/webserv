@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:27:18 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 12:08:00 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 13:53:02 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,16 @@ typedef enum e_req_state {
 } ReqState;
 
 typedef enum e_conf_state {
-	conf_start,
 	conf_server,
-	conf_brace_after_server,
-	conf_after_brace
+	conf_server_brace,
+	conf_after_server_brace,
+	conf_inbetween,
+	conf_token,
+	conf_server_name,
+	conf_listen,
+	conf_location,
+	conf_value_after_token,
+	conf_semicolon_after_value,
 } ConfState;
 
 #endif
