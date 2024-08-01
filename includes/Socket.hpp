@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 13:25:36 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 16:18:34 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,12 @@ class Socket
 		void addServerName(std::string name);
 		std::vector<std::string> getServerNames() const;
 		void addCGIExtension(std::string extension, std::string path);
+
+		void								setFd(int fd);
+		int									getFd() const;
+		bool								usesCGI() const;
+		void								addCgiHandler(std::string extension, std::string path);
+		std::string							getCgiHandler(std::string extension) const;
 };
 
 #endif
