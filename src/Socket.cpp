@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 16:15:30 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 16:37:55 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ bool Socket::usesCGI() const
 void Socket::addCgiHandler(std::string extension, std::string path)
 {
 	this->_CGI_map[extension] = path;
+	this->_useCGI = true;
 }
 
 std::string Socket::getCgiHandler(std::string extension) const

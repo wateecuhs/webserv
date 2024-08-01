@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 14:27:16 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 17:08:09 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ Request::Request(std::string request)
 		std::cout << it->first << ": " << it->second << std::endl;
 	setHost(this->_headers["Host"]);
 	setBody(request.substr(headers_end + 4));
+	std::cout << "Body found -> " << this->_body << std::endl;
 }
 
 Request::Request(Request &src)
