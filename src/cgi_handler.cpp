@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/31 18:00:30 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 16:27:09 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <sys/socket.h>
 #include <cstdlib>
 #include <sstream>
+
+#include <fstream>
 
 class InternalServerError500: public std::exception {
 	public:
@@ -35,20 +37,31 @@ class BadGateway502: public std::exception {
 
 std::string	execCGI(const Request &request, const Socket &socket)
 {
-	std::string	request_method = "REQUEST_METHOD=" + request.getMethod();
+	std::string	request_method = "REQUEST_METHOD=" + request.getMethodString();
 	std::string	query_string = "QUERY_STRING=" + request.getQuery();
-	std::string	content_length = "CONTENT_LENGTH=" + request.getBody().size();
-	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.') + 1);
+	std::stringstream ss;
+	ss << request.getBody().size();
+	std::string	content_length = "CONTENT_LENGTH=" + ss.str();
+	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
+
+
+	std::cout << "Extension :'" << extension << "'" << std::endl;	//remove
 	std::string cgi_handler = socket.getCgiHandler(extension);
+
+	std::cerr << "cgi_handler: " << cgi_handler << std::endl;
 
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
-	const char 	*argv[3] = {cgi_handler.c_str(), request.getPath().c_str(), NULL};
+	std::string	path = request.getPath();
+	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
 
 	pid_t 	pid;
 	int 	pipe_out[2];
 	int 	pipe_in[2];
 	int 	status = 0;
+
+	std::ofstream file("log.txt", std::ios::app);	//remove
+
 
 	if (pipe(pipe_out) == -1 || pipe(pipe_in) == -1)
 		throw InternalServerError500();
@@ -65,9 +78,15 @@ std::string	execCGI(const Request &request, const Socket &socket)
 		close(pipe_in[0]);
 
 		if (access(cgi_handler.c_str(), X_OK) == -1)
+		{
+			file << "access failed" << std::endl;
 			throw BadGateway502();
+		}
 		if (execve(const_cast<const char*>(cgi_handler.c_str()), const_cast<char* const*>(argv), const_cast<char* const*>(env)) == -1)
+		{
+			file << "execve failed" << std::endl;
 			throw BadGateway502();
+		}
 		std::exit(EXIT_SUCCESS);
 	}
 	else
@@ -81,20 +100,30 @@ std::string	execCGI(const Request &request, const Socket &socket)
 
 		char 				buffer[2048];
 		int 				bytes_read;
-		std::stringstream 	ss;
+		std::stringstream 	ss1;
 
-		while ((bytes_read = read(pipe_out[0], buffer, 2048)) > 0)
-			ss << buffer;
-		if (bytes_read == -1)
-			throw BadGateway502();
-
+		while ((bytes_read = read(pipe_out[0], buffer, 2047)) > 0 || ss1.eof() || ss1.fail()){
+			// std::cerr << "bytes_read: " << bytes_read << std::endl;
+			if (bytes_read == -1){
+				// file << "bytes_read == -1" << std::endl;
+				throw BadGateway502();
+			}
+			buffer[bytes_read] = '\0';
+			ss1 << buffer;
+			// std::cerr << "buffer: " << buffer << std::endl;
+		}
+		// std::cerr << "buffer: " << buffer << std::endl;
+		// std::cerr << "ss1: " << ss1.str() << std::endl;
 		close(pipe_out[0]);
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
 
-		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(ss.str().length()) + "\r\n\r\n" + ss.str();
+		std::stringstream ss2;
+		ss2 << ss1.str().size();
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + ss1.str();
 		// send(socket.getFd(), response.c_str(), response.size(), 0);
+		std::cerr << "response1 :" << response << std::endl;
 		return response;
 	}
 }
@@ -107,15 +136,24 @@ void	handleCGI(const Request &request, const Socket &socket){
 	if (backup_stdout  == -1)
 		throw InternalServerError500();
 	std::string content = execCGI(request, socket);
-	if (dup2(backup_stdin, STDIN_FILENO) || dup2(backup_stdout, STDOUT_FILENO))
+	if (dup2(backup_stdin, STDIN_FILENO) == -1 || dup2(backup_stdout, STDOUT_FILENO) == -1)
+	{
+		std::cerr << "dup2 failed" << std::endl;
 		throw InternalServerError500();
+	}
 	close(backup_stdin);
 	close(backup_stdout);
+
+	std::ofstream file("log.txt", std::ios::app);	//remove
 
 	std::stringstream ss;
 	ss << content.size();
 	std::string size = ss.str();
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+	std::cerr << "response2" << std::endl;
 	if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+	{
+		file << "send failed" << std::endl;
 		throw InternalServerError500();
+	}
 }

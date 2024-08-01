@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 13:25:49 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/01 16:15:30 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ Socket::Socket()
 {
 }
 
-Socket::Socket(int port)
+Socket::Socket(int fd)
 {
-	this->_port = port;
+	this->_fd = fd;
 }
 
 Socket::~Socket()
@@ -52,4 +52,27 @@ std::vector<std::string> Socket::getServerNames() const
 void Socket::addServerName(std::string name)
 {
 	this->_server_names.push_back(name);
+}
+
+int Socket::getFd() const
+{
+	return this->_fd;
+}
+
+bool Socket::usesCGI() const
+{
+	return this->_useCGI;
+}
+
+void Socket::addCgiHandler(std::string extension, std::string path)
+{
+	this->_CGI_map[extension] = path;
+}
+
+std::string Socket::getCgiHandler(std::string extension) const
+{
+	std::map<std::string, std::string>::const_iterator it = this->_CGI_map.find(extension);
+	if (it == this->_CGI_map.end())
+		return "";
+	return it->second;
 }

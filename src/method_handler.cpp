@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/07/31 18:01:11 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 16:20:44 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void handleGetRequest(const Request &request, const Socket &socket) {
 	}
 
 	//handle CGI
-	std::string	file_extension = path.substr(path.find_last_of('.') + 1);
+	std::string	file_extension = path.substr(path.find_last_of('.'));
 	if (!socket.getCgiHandler(file_extension).empty() && socket.usesCGI()){
 		handleCGI(request, socket);
 		// int backup_stdin = dup(STDIN_FILENO);
@@ -136,7 +136,7 @@ void handlePostRequest(const Request &request, const Socket &socket) {
 	}
 
 	//handle CGI
-	std::string	file_extension = path.substr(path.find_last_of('.') + 1);
+	std::string	file_extension = path.substr(path.find_last_of('.'));
 	if (!socket.getCgiHandler(file_extension).empty() && socket.usesCGI()){
 		handleCGI(request, socket);
 		// int backup_stdin = dup(STDIN_FILENO);

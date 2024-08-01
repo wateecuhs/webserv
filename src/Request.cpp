@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 14:04:30 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 14:27:16 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,21 @@ void Request::setMethod(Methods method)
 Methods Request::getMethod() const
 {
 	return this->_method;
+}
+
+std::string	Request::getMethodString() const
+{
+	switch (this->_method)
+	{
+		case GET:
+			return "GET";
+		case POST:
+			return "POST";
+		case DELETE:
+			return "DELETE";
+		default:
+			return "UNKNOWN";
+	}
 }
 
 void Request::setPath(std::string path)

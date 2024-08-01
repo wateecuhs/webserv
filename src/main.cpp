@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:30:43 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/01 16:21:29 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@
 #include <arpa/inet.h>
 #include <cstring>
 
-void methodHandler(const Request& request, int socket);
+void methodHandler(const Request &request, const Socket &socket);
+void	handleCGI(const Request &request, const Socket &socket);
 
 int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 {
@@ -74,7 +75,17 @@ int main(int argc, char **argv)
 				try {
 					std::cout << std::endl << buf << std::endl;
 					Request rq(buf);
-					methodHandler(rq, client_socket);
+					Socket socket(client_socket);
+					// methodHandler(rq, socket);
+					socket.addCgiHandler(".py", "/usr/bin/python3");
+					// std::cout << "ici : "<< socket.getCgiHandler(".py") << std::endl;
+					std::cerr << "before handleCGI" << std::endl;
+					handleCGI(rq, socket);
+					std::cerr << "after handleCGI" << std::endl;
+
+
+					// const char 	*argv[3] = {"/usr/bin/python3", "hello.py", NULL};
+					// execve("/usr/bin/python3", const_cast<char* const*>(argv), NULL);
 				}
 				catch (const std::exception &e) {
 					send(client_socket, e.what(), strlen(e.what()), 0);

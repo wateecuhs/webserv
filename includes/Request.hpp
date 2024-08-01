@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 14:04:07 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/01 14:23:26 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Request {
 		Request(std::string request);
 		~Request();
 		Methods								getMethod() const;
+		std::string							getMethodString() const;
 		void								setMethod(Methods method);
 		std::string							getPath() const;
 		void								setPath(std::string path);
