@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:32:01 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:47:31 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <fstream>
 #include "Request.hpp"
 
-Socket			*parseConfig(std::string conf_path);
+std::vector<Socket> parseConfig(std::string conf_path);
 void			parseRequestLine(std::string r, Request &request);
 void			parseHeaders(std::string r, Request &req);
 void			verifyAddHostPort(std::string content, Socket &socket);

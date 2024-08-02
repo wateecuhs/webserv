@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:34:18 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:53:26 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ Socket::Socket(std::stringstream &iss, std::string word)
 
 	while (iss >> word)
 	{
-		std::cout << "Sword: " << word << std::endl;
 		trailing_semicolon = word[word.size() - 1] == ';' && word.size() > 1;
 		if (trailing_semicolon)
 			shaved_word = word.substr(0, word.size() - 1);
@@ -112,7 +111,6 @@ Socket &Socket::operator=(const Socket &copy)
 		this->_fd = copy._fd;
 		this->_host = copy._host;
 		this->_port = copy._port;
-		this->_useCGI = copy._useCGI;
 		this->_server_names = copy._server_names;
 		this->_error_pages = copy._error_pages;
 		this->_body_size = copy._body_size;
@@ -189,4 +187,14 @@ void Socket::addLocation(Location location)
 std::vector<Location> Socket::getLocations() const
 {
 	return this->_locations;
+}
+
+void Socket::setFd(int fd)
+{
+	this->_fd = fd;
+}
+
+int Socket::getFd() const
+{
+	return this->_fd;
 }

@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:33:46 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:50:48 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ class Socket
 		int									_fd;
 		std::string							_host;
 		int									_port;
-		bool								_useCGI;
 		std::map<int, std::string>			_error_pages;
 		std::vector<std::string>			_server_names;
 		int									_body_size;
@@ -38,6 +37,8 @@ class Socket
 		Socket(const Socket &copy);
 		Socket &operator=(const Socket &copy);
 
+		void								setFd(int fd);
+		int									getFd() const;
 		void								addServerName(std::string name);
 		std::vector<std::string>			getServerNames() const;
 		void								setHost(std::string host);

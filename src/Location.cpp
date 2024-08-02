@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:28:20 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:53:32 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ Location::Location(std::stringstream &iss, std::string word)
 
 	while (iss >> word)
 	{
-		std::cout << "Lword: " << word << std::endl;
 		trailing_semicolon = word[word.size() - 1] == ';' && word.size() > 1;
 		if (trailing_semicolon)
 			shaved_word = word.substr(0, word.size() - 1);

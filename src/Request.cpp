@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:33:56 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:53:02 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,4 +150,14 @@ std::string Request::getHost() const
 const char *BadRequest::what() const throw()
 {
 	return "Bad Request";
+}
+
+void Request::setQuery(std::string query)
+{
+	this->_query = query;
+}
+
+std::string Request::getQuery() const
+{
+	return this->_query;
 }

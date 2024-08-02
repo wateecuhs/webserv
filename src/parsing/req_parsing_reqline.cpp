@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   r_parsing_reqline.cpp                              :+:      :+:    :+:   */
+/*   req_parsing_reqline.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:32:13 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/30 11:47:26 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ bool isHTTP(std::string r, int pos, int len)
 
 void parseRequestLine(std::string r, Request &request)
 {
-	State state = req_start;
+	ReqState state = req_start;
 	std::string::iterator cur_begin;
 
 	for (std::string::iterator it = r.begin(); it != r.end(); it++)

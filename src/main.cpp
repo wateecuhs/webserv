@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:35:49 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:49:11 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,16 @@ int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 
 int main(int argc, char **argv)
 {
-	Socket		*socket = parseConfig("config.conf");
-
+	std::vector<Socket> servers;
+	
+	try {
+		servers = parseConfig("config_tests/test1.config");
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
+	(void)argc, (void)argv;
 	int			fds[2];
 	char		buf[2048] = {0};
 	int			client_socket;
@@ -75,10 +83,9 @@ int main(int argc, char **argv)
 				try {
 					std::cout << std::endl << buf << std::endl;
 					Request rq(buf);
-					Socket socket(client_socket);
-
-					socket.addCgiHandler(".py", "/usr/bin/python3");
-					methodHandler(rq, socket);
+					// Socket socket(client_socket);
+					// socket.addCgiHandler(".py", "/usr/bin/python3");
+					// methodHandler(rq, socket);
 
 					// handleCGI(rq, socket);
 				}

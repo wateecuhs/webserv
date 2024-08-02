@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:22:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:28:51 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:48:11 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void printSocket(Socket &socket)
 
 std::vector<Socket> parseServers(std::string content);
 
-Socket *parseConfig(std::string conf_path)
+std::vector<Socket> parseConfig(std::string conf_path)
 {
 	std::ifstream	cfstream;
 
@@ -65,13 +65,7 @@ Socket *parseConfig(std::string conf_path)
 		throw InvalidConfigFile();
 	std::string content((std::istreambuf_iterator<char>(cfstream)),
 						 std::istreambuf_iterator<char>());
-	try {
-		parseServers(content);
-	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
-	return NULL;
+	return parseServers(content);
 }
 
 std::vector<Socket> parseServers(std::string content)
