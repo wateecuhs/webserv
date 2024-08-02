@@ -6,7 +6,7 @@
 #    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/08/02 13:41:57 by alermolo         ###   ########.fr        #
+#    Updated: 2024/08/02 15:43:48 by alermolo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,8 @@ HEADERS		=	parsing.hpp								\
 				Socket.hpp								\
 				enums.hpp								\
 				Request.hpp								\
-				exceptions.hpp
+				exceptions.hpp							\
+				utils.hpp
 
 RAW_SOURCES	=	main.cpp								\
 				parsing/parsing.cpp						\
@@ -27,7 +28,8 @@ RAW_SOURCES	=	main.cpp								\
 				method_handler.cpp						\
 				Socket.cpp								\
 				cgi_handler.cpp							\
-				exceptions.cpp
+				exceptions.cpp							\
+				utils.cpp
 
 
 OBJ_DIR		=	.build

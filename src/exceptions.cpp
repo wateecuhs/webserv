@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:37:57 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 14:51:23 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 14:53:46 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
-#include <iostream>
 
 const char *Forbidden403::what() const throw()
 {

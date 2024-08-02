@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 16:53:10 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 15:47:32 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <string>
 
-int ft_strtoi(std::string str);
+int 		ft_strtoi(std::string str);
+std::string	strSizeToStr(std::string str);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:42:30 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 16:52:38 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 15:52:53 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,11 @@ int ft_strtoi(std::string str)
 		ret = ret * 10 + *it - '0';
 	}
 	return ret;
+}
+
+std::string	strSizeToStr(std::string str)
+{
+	std::stringstream ss;
+	ss << str.size();
+	return ss.str();
 }

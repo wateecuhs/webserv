@@ -6,13 +6,14 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 14:34:36 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 15:51:11 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 #include "Socket.hpp"
 #include "exceptions.hpp"
+#include "utils.hpp"
 #include <fstream>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -24,7 +25,7 @@ void		handleCGI(Request &request, const Socket &socket);
 
 void handleGetRequest(Request &request, const Socket &socket) {
 	std::string path = request.getPath();
-	std::stringstream ss;
+	// std::stringstream ss;
 
 	if (request.pathIsDirectory()){
 		std::string indexPath = path + "/index";
@@ -34,9 +35,9 @@ void handleGetRequest(Request &request, const Socket &socket) {
 			if (indexFile) {
 				std::string content((std::istreambuf_iterator<char>(indexFile)),
 									std::istreambuf_iterator<char>());
-				ss << content.size();
-				std::string size = ss.str();
-				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+				// ss << content.size();
+				// std::string size = ss.str();
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 				if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
 					throw InternalServerError500();
 				indexFile.close();
@@ -66,9 +67,9 @@ void handleGetRequest(Request &request, const Socket &socket) {
 
 	std::string content((std::istreambuf_iterator<char>(file)),
 						 std::istreambuf_iterator<char>());
-	ss << content.size();
-	std::string size = ss.str();
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+	// ss << content.size();
+	// std::string size = ss.str();
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	send(socket.getFd(), response.c_str(), response.size(), 0);
 	file.close();
 }
@@ -87,10 +88,10 @@ void handlePostRequest(Request &request, const Socket &socket) {
 		}
 		std::string body = request.getBody();
 		file << body;
-		std::stringstream ss;
-		ss << body.size();
-		std::string size = ss.str();
-		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + size + "\r\n\r\n" + body;
+		// std::stringstream ss;
+		// ss << body.size();
+		// std::string size = ss.str();
+		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
 		send(socket.getFd(), response.c_str(), response.size(), 0);
 		file.close();
 		return ;
@@ -110,11 +111,11 @@ void handlePostRequest(Request &request, const Socket &socket) {
 
 	std::string body = request.getBody() + "\n";
 	file << body;
-	std::stringstream ss;
-	ss << body.size();
-	std::string size = ss.str();
+	// std::stringstream ss;
+	// ss << body.size();
+	// std::string size = ss.str();
 
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + body;
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
 	send(socket.getFd(), response.c_str(), response.size(), 0);
 	file.close();
 }
