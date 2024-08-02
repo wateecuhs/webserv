@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:27:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 14:33:33 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:35:02 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ typedef enum e_methods{
 } Methods;
 
 
-typedef enum e_req_state {
+typedef enum e_state {
 	req_start,
 	req_method,
 	req_after_method,

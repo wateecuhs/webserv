@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 17:48:58 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:32:30 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class Request {
 		std::string							_host;
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
+		std::string							_query;
 
 		Request();
 	public:
@@ -34,6 +35,7 @@ class Request {
 		Request(std::string request);
 		~Request();
 		Methods								getMethod() const;
+		std::string							getMethodString() const;
 		void								setMethod(Methods method);
 		std::string							getPath() const;
 		void								setPath(std::string path);
@@ -46,6 +48,8 @@ class Request {
 		std::string							getBody() const;
 		void								setHost(std::string host);
 		std::string							getHost() const;
+		void								setQuery(std::string query);
+		std::string							getQuery() const;
 
 		bool								pathIsDirectory() const;
 };

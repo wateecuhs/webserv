@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 17:48:57 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:33:56 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Request::Request(std::string request)
 	std::cout << "Method found -> " << this->_method << std::endl;
 	std::cout << "Path found -> " << this->_path << std::endl;
 	std::cout << "Version found -> " << this->_http_version << std::endl;
-	
+
 	headers_start += 2;
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
@@ -42,6 +42,7 @@ Request::Request(std::string request)
 		std::cout << it->first << ": " << it->second << std::endl;
 	setHost(this->_headers["Host"]);
 	setBody(request.substr(headers_end + 4));
+	std::cout << "Body found -> " << this->_body << std::endl;
 }
 
 Request::Request(Request &src)
@@ -59,6 +60,21 @@ void Request::setMethod(Methods method)
 Methods Request::getMethod() const
 {
 	return this->_method;
+}
+
+std::string	Request::getMethodString() const
+{
+	switch (this->_method)
+	{
+		case GET:
+			return "GET";
+		case POST:
+			return "POST";
+		case DELETE:
+			return "DELETE";
+		default:
+			return "UNKNOWN";
+	}
 }
 
 void Request::setPath(std::string path)
@@ -130,7 +146,6 @@ std::string Request::getHost() const
 {
 	return this->_host;
 }
-
 
 const char *BadRequest::what() const throw()
 {

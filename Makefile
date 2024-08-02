@@ -6,7 +6,7 @@
 #    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/08/01 17:30:20 by panger           ###   ########.fr        #
+#    Updated: 2024/08/02 16:31:04 by panger           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,9 +18,11 @@ HEADERS		=	parsing.hpp								\
 				enums.hpp								\
 				Request.hpp								\
 				utils.hpp								\
-				Location.hpp
+				Location.hpp							\
+				exceptions.hpp
 
 RAW_SOURCES	=	main.cpp								\
+				parsing/parsing.cpp						\
 				Request.cpp								\
 				Socket.cpp								\
 				parsing/conf_parsing.cpp				\
@@ -29,7 +31,9 @@ RAW_SOURCES	=	main.cpp								\
 				parsing/req_parsing_headers.cpp			\
 				method_handler.cpp						\
 				Location.cpp							\
-				utils.cpp
+				utils.cpp								\
+				cgi_handler.cpp							\
+				exceptions.cpp
 
 
 OBJ_DIR		=	.build

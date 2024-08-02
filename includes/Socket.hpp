@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 15:57:48 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:33:46 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ class Socket
 		std::vector<std::string>			_server_names;
 		int									_body_size;
 		std::vector<Location>				_locations;
+
+	public:
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);
