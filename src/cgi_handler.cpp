@@ -6,13 +6,14 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 13:37:41 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 16:05:11 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 #include "Request.hpp"
 #include "exceptions.hpp"
+#include "utils.hpp"
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -26,9 +27,7 @@ std::string	execCGI(Request &request, const Socket &socket)
 	if (request.getQuery().empty())
 		request.setQuery(request.getBody());
 	std::string	query_string = "QUERY_STRING=" + request.getQuery();
-	std::stringstream ss;
-	ss << request.getBody().size();
-	std::string	content_length = "CONTENT_LENGTH=" + ss.str();
+	std::string	content_length = "CONTENT_LENGTH=" + strSizeToStr(request.getBody());
 	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
 	std::string cgi_handler = socket.getCgiHandler(extension);
 
@@ -46,6 +45,8 @@ std::string	execCGI(Request &request, const Socket &socket)
 	pid = fork();
 	if (pid == -1)
 		throw InternalServerError500();
+
+	//child process
 	if (pid == 0)
 	{
 		close(pipe_out[0]);
@@ -62,6 +63,8 @@ std::string	execCGI(Request &request, const Socket &socket)
 
 		std::exit(EXIT_SUCCESS);
 	}
+
+	//parent process
 	else
 	{
 		close(pipe_out[1]);
@@ -73,22 +76,21 @@ std::string	execCGI(Request &request, const Socket &socket)
 
 		char 				buffer[2048];
 		int 				bytes_read;
-		std::stringstream 	ss1;
+		std::stringstream 	ss;
 
-		while ((bytes_read = read(pipe_out[0], buffer, 2047)) > 0 || ss1.eof() || ss1.fail()){
+		while ((bytes_read = read(pipe_out[0], buffer, 2047)) > 0 || ss.eof() || ss.fail()){
 			if (bytes_read == -1)
 				throw BadGateway502();
 			buffer[bytes_read] = '\0';
-			ss1 << buffer;
+			ss << buffer;
 		}
 		close(pipe_out[0]);
+
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
 
-		std::stringstream ss2;
-		ss2 << ss1.str().size();
-		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + ss2.str() + "\r\n\r\n" + ss1.str();
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
 		return response;
 	}
 }
@@ -108,10 +110,7 @@ void	handleCGI(Request &request, const Socket &socket){
 	close(backup_stdin);
 	close(backup_stdout);
 
-	std::stringstream ss;
-	ss << content.size();
-	std::string size = ss.str();
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + size + "\r\n\r\n" + content;
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
 		throw InternalServerError500();
 }
