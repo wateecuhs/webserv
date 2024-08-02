@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:12 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:51:08 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <vector>
 #include "Location.hpp"
 
+class Location;
+
 class Socket
 {
 	private:
@@ -28,8 +30,6 @@ class Socket
 		std::vector<std::string>			_server_names;
 		int									_body_size;
 		std::vector<Location>				_locations;
-
-	public:
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);

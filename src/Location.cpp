@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:14:15 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:59:54 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "parsing.hpp"
 #include "exceptions.hpp"
 
-Location::Location(std::stringstream &iss, std::string word)
+Location::Location(std::stringstream &iss, std::string word, Socket &socket): _socket(socket)
 {
 	LocationState	state = loc_brace_open;
 	std::string		shaved_word;
@@ -134,7 +134,7 @@ Location::~Location()
 {
 }
 
-Location::Location(const Location &copy)
+Location::Location(const Location &copy): _socket(copy._socket)
 {
 	this->_path = copy._path;
 	this->_root = copy._root;
@@ -166,6 +166,7 @@ Location &Location::operator=(const Location &copy)
 	this->_file_upload = copy._file_upload;
 	this->_upload_path = copy._upload_path;
 	this->_http_redirection = copy._http_redirection;
+	this->_socket = copy._socket;
 	return *this;
 }
 

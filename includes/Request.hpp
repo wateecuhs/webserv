@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:49 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:59:07 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,14 @@
 # define REQUEST_HPP
 
 #include "enums.hpp"
+#include "Location.hpp"
+#include "Socket.hpp"
 #include <map>
 #include <iostream>
 #include <exception>
+
+class Location;
+class Socket;
 
 class Request {
 	private:
@@ -28,10 +33,12 @@ class Request {
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		std::string							_query;
-
+		
+		Location							*_location;
+		Socket								&_socket;
 		Request();
-	public:
 		Request(Request &src);
+	public:
 		Request(std::string request);
 		~Request();
 		Methods								getMethod() const;

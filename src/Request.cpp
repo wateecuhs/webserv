@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:12:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:48:38 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #include <sys/stat.h>
 #include "exceptions.hpp"
 
-Request::Request() {}
 
 Request::Request(std::string request)
 {
