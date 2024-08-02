@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:08:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:28:15 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Socket::Socket(std::stringstream &iss, std::string word)
 
 	while (iss >> word)
 	{
+		std::cout << "Sword: " << word << std::endl;
 		trailing_semicolon = word[word.size() - 1] == ';' && word.size() > 1;
 		if (trailing_semicolon)
 			shaved_word = word.substr(0, word.size() - 1);
@@ -89,9 +90,10 @@ Socket::Socket(std::stringstream &iss, std::string word)
 				break;
 
 			default:
-				return ;
+				throw InvalidConfigFile();
 		}
 	}
+	throw InvalidConfigFile();
 }
 
 Socket::~Socket()

@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 14:28:07 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:15:45 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:25:17 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,8 @@ ConfState verifyErrorPageMatch(std::string word, std::stringstream &iss, Socket 
 
 bool validateLocation(std::string path)
 {	
+	if (path == "/")
+		return true;
 	if (path.size() < 2 || path[0] != '/' || path[path.size() - 1] != '/')
 		return false;
 	for (std::string::iterator it = path.begin() + 1; it != path.end() - 1; it++)

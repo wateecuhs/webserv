@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:22:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:10:12 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:28:51 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ void printSocket(Socket &socket)
 }
 
 std::vector<Socket> parseServers(std::string content);
-Socket parseServerBlock(std::stringstream &iss, std::string word);
 
 Socket *parseConfig(std::string conf_path)
 {
@@ -88,25 +87,25 @@ std::vector<Socket> parseServers(std::string content)
 			case conf_server:
 				if (word == "server")
 					state = conf_server_brace;
-				else if (word == "server{")
-					state = conf_after_server_brace;
-				else
-					throw InvalidConfigFile();
-				break;
-
-			case conf_server_brace:
-				if (word == "{")
-				{
+				else if (word == "server{"){
 					Socket tmp(iss, word);
 					sockets.push_back(tmp);
-					printSocket(tmp);
-					state = conf_after_server_brace;
-					return sockets;
+					// printSocket(tmp);
 				}
 				else
 					throw InvalidConfigFile();
 				break;
 
+			case conf_server_brace:
+				if (word == "{") {
+					Socket tmp(iss, word);
+					sockets.push_back(tmp);
+					// printSocket(tmp);
+					state = conf_server;
+				}
+				else
+					throw InvalidConfigFile();
+				break;
 			default:
 				throw InvalidConfigFile();
 		}
