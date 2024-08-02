@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/07/29 14:31:34 by panger           ###   ########.fr       */
+/*   Updated: 2024/07/31 17:48:57 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,8 @@ std::string Request::getHost() const
 	return this->_host;
 }
 
+
 const char *BadRequest::what() const throw()
 {
-	return "400: Bad Request";
+	return "Bad Request";
 }

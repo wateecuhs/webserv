@@ -1,29 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.hpp                                        :+:      :+:    :+:   */
+/*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 13:34:10 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/01 16:53:10 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_H
-# define PARSING_H
+#ifndef UTILS_HPP
+# define UTILS_HPP
 
-#include "Socket.hpp"
-#include "enums.hpp"
-#include <iostream>
-#include <fstream>
-#include "Request.hpp"
+#include <string>
 
-Socket		*parseConfig(std::string conf_path);
-void		parseRequestLine(std::string r, Request &request);
-void		parseHeaders(std::string r, Request &req);
-void		verifyAddHostPort(std::string content, Socket &socket);
-ConfState	verifyErrorPageMatch(std::string word, std::stringstream &iss, Socket &socket);
-bool		validateLocation(std::string path);
+int ft_strtoi(std::string str);
 
 #endif

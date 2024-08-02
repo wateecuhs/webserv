@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/07/31 13:25:36 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/01 17:30:31 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,48 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "Location.hpp"
 
 class Socket
 {
 	private:
 		int									_fd;
-		unsigned long						_host;
+		std::string							_host;
 		int									_port;
 		bool								_useCGI;
-		std::map<std::string, std::string>	_CGI_map;
+		std::map<int, std::string>			_error_pages;
 		std::vector<std::string>			_server_names;
-
-	public:
+		int									_body_size;
+		std::vector<Location>				_locations;
 		Socket();
-		Socket(int port);
+	public:
+		Socket(std::stringstream &iss, std::string word);
 		~Socket();
 		Socket(const Socket &copy);
 		Socket &operator=(const Socket &copy);
-		void addServerName(std::string name);
-		std::vector<std::string> getServerNames() const;
-		void addCGIExtension(std::string extension, std::string path);
+
+		void								addServerName(std::string name);
+		std::vector<std::string>			getServerNames() const;
+		void								setHost(std::string host);
+		std::string							getHost() const;
+		void								setPort(int port);
+		int									getPort() const;
+		void								addErrorPage(int error_code, std::string path);
+		std::map<int, std::string>			getErrorPages() const;
+		void								setBodySize(int size);
+		int									getBodySize() const;
+};
+
+class InvalidConfigFile: public std::exception
+{
+	public:
+		virtual const char *what() const throw();
+};
+
+class BadInput: public std::exception
+{
+	public:
+		virtual const char *what() const throw();
 };
 
 #endif
