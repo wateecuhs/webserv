@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 14:34:36 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 16:54:43 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +58,12 @@ void handleGetRequest(Request &request, const Socket &socket) {
 	}
 
 	std::string	file_extension = path.substr(path.find_last_of('.'));
-	if (socket.usesCGI() && !socket.getCgiHandler(file_extension).empty()){
-		handleCGI(request, socket);
-		file.close();
-		return ;
-	}
+	// NE COMPILE PAS CAR LES CGI SE TROUVENT DANS LOCATION
+	// if (socket.usesCGI() && !socket.getCgiHandler(file_extension).empty()){
+	// 	handleCGI(request, socket);
+	// 	file.close();
+	// 	return ;
+	// }
 
 	std::string content((std::istreambuf_iterator<char>(file)),
 						 std::istreambuf_iterator<char>());
@@ -97,11 +98,12 @@ void handlePostRequest(Request &request, const Socket &socket) {
 	}
 
 	std::string	file_extension = path.substr(path.find_last_of('.'));
-	if (!socket.getCgiHandler(file_extension).empty() && socket.usesCGI()){
-		handleCGI(request, socket);
-		file.close();
-		return ;
-	}
+	// NE COMPILE PAS CAR LES CGI SE TROUVENT DANS LOCATION
+	// if (!socket.getCgiHandler(file_extension).empty() && socket.usesCGI()){
+	// 	handleCGI(request, socket);
+	// 	file.close();
+	// 	return ;
+	// }
 
 	if (access(path.c_str(), W_OK) == -1){
 		file.close();

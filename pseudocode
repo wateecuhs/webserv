@@ -1,5 +1,6 @@
-parse config
-	-> format into socket class
-
-listen and epoll all sockets
-	-> parse requests and respond accordingly
+for char in config
+	skip ws
+	first word is server keyword
+	after server keyword, a block is expected
+	in block, parse each token one by one
+	token is "key value" where there can be multiple WSs between key and value and value can be a string or a block depending on the key

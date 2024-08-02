@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi_handler.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 13:37:41 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 16:54:59 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ std::string	execCGI(Request &request, const Socket &socket)
 	ss << request.getBody().size();
 	std::string	content_length = "CONTENT_LENGTH=" + ss.str();
 	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
-	std::string cgi_handler = socket.getCgiHandler(extension);
+	// NE COMPILE PAS CAR CGI DANS LOCATION
+	// std::string cgi_handler = socket.getCgiHandler(extension);
+	std::string cgi_handler = "/usr/bin/php-cgi";
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
 	std::string	path = request.getPath();
