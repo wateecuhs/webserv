@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:50:48 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:10:12 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,6 @@ class Socket
 		int									getBodySize() const;
 		void								addLocation(Location location);
 		std::vector<Location>				getLocations() const;
-};
-
-class InvalidConfigFile: public std::exception
-{
-	public:
-		virtual const char *what() const throw();
-};
-
-class BadInput: public std::exception
-{
-	public:
-		virtual const char *what() const throw();
 };
 
 #endif

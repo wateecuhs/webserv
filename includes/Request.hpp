@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:32:30 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:10:49 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,6 @@ class Request {
 		std::string							getQuery() const;
 
 		bool								pathIsDirectory() const;
-};
-
-class BadRequest: public std::exception {
-	public:
-		virtual const char *what() const throw();
 };
 
 #endif

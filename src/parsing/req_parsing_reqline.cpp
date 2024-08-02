@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 10:59:21 by panger            #+#    #+#             */
-/*   Updated: 2024/07/30 11:47:26 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:11:08 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include "exceptions.hpp"
 
 
 Methods parseMethod(std::string r, int len)

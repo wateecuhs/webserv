@@ -6,12 +6,13 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:42:30 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 16:52:38 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:12:41 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sstream>
 #include "Socket.hpp"
+#include "exceptions.hpp"
 
 int ft_strtoi(std::string str)
 {

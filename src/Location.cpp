@@ -6,13 +6,14 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:53:32 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:14:15 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
 #include <sstream>
 #include "parsing.hpp"
+#include "exceptions.hpp"
 
 Location::Location(std::stringstream &iss, std::string word)
 {
@@ -122,7 +123,6 @@ Location::Location(std::stringstream &iss, std::string word)
 				state = trailing_semicolon ? loc_new_token : loc_semicolon;
 				break;
 
-				break;
 			default:
 				break;
 		}

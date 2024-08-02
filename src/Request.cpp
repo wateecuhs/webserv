@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:53:02 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:12:31 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <sstream>
 #include <cstring>
 #include <sys/stat.h>
+#include "exceptions.hpp"
 
 Request::Request() {}
 
@@ -145,11 +146,6 @@ void Request::setHost(std::string host)
 std::string Request::getHost() const
 {
 	return this->_host;
-}
-
-const char *BadRequest::what() const throw()
-{
-	return "Bad Request";
 }
 
 void Request::setQuery(std::string query)

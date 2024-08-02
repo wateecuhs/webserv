@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 14:28:07 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:25:17 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:10:31 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include "exceptions.hpp"
 
 int verifyPort(std::string content)
 {

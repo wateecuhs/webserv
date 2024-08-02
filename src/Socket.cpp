@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:53:26 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:11:46 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "utils.hpp"
 #include "enums.hpp"
 #include "parsing.hpp"
-
+#include "exceptions.hpp"
 
 Socket::Socket(std::stringstream &iss, std::string word)
 {
@@ -147,16 +147,6 @@ void Socket::setPort(int port)
 int Socket::getPort() const
 {
 	return this->_port;
-}
-
-const char *InvalidConfigFile::what() const throw()
-{
-	return "Config file is invalid";
-}
-
-const char *BadInput::what() const throw()
-{
-	return "Invalid input";
 }
 
 void Socket::addErrorPage(int error_code, std::string path)

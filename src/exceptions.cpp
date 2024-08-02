@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exceptions.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:37:57 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 14:51:23 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 17:12:01 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,19 @@ const char *InternalServerError500::what() const throw()
 const char *BadGateway502::what() const throw()
 {
 	return "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n";
+}
+
+const char *InvalidConfigFile::what() const throw()
+{
+	return "Config file is invalid";
+}
+
+const char *BadInput::what() const throw()
+{
+	return "Invalid input";
+}
+
+const char *BadRequest::what() const throw()
+{
+	return "Bad Request";
 }

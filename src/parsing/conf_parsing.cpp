@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:22:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:48:11 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 17:10:43 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <cstring>
 #include "Socket.hpp"
 #include "utils.hpp"
+#include "exceptions.hpp"
 
 void printSocket(Socket &socket)
 {
