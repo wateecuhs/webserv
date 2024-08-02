@@ -6,32 +6,19 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/01 17:39:00 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 13:37:41 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 #include "Request.hpp"
+#include "exceptions.hpp"
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <cstdlib>
 #include <sstream>
-
-class InternalServerError500: public std::exception {
-	public:
-		virtual const char *what() const throw() {
-			return "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
-		}
-};
-
-class BadGateway502: public std::exception {
-	public:
-		virtual const char *what() const throw() {
-			return "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n";
-		}
-};
 
 std::string	execCGI(Request &request, const Socket &socket)
 {

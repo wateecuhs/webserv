@@ -6,12 +6,13 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/01 17:37:31 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 14:34:36 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 #include "Socket.hpp"
+#include "exceptions.hpp"
 #include <fstream>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -20,27 +21,6 @@
 
 std::string	execCGI(Request &request, const Socket &socket);
 void		handleCGI(Request &request, const Socket &socket);
-
-class NotFound404: public std::exception {
-	public:
-		virtual const char *what() const throw() {
-			return "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n";
-		}
-};
-
-class Forbidden403: public std::exception {
-	public:
-		virtual const char *what() const throw() {
-			return "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\n\r\n";
-		}
-};
-
-class InternalServerError500: public std::exception {
-	public:
-		virtual const char *what() const throw() {
-			return "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
-		}
-};
 
 void handleGetRequest(Request &request, const Socket &socket) {
 	std::string path = request.getPath();
