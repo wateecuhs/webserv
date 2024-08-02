@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 17:08:09 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 17:12:31 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <sstream>
 #include <cstring>
 #include <sys/stat.h>
+#include "exceptions.hpp"
 
 Request::Request() {}
 
@@ -155,9 +156,4 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
-}
-
-const char *BadRequest::what() const throw()
-{
-	return "400: Bad Request";
 }

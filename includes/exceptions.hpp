@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exceptions.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:33:44 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 13:38:58 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 17:10:55 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,23 @@ class BadGateway502: public std::exception {
 	public:
 		virtual const char *what() const throw();
 };
+
+class InvalidConfigFile: public std::exception
+{
+	public:
+		virtual const char *what() const throw();
+};
+
+class BadInput: public std::exception
+{
+	public:
+		virtual const char *what() const throw();
+};
+
+class BadRequest: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+
 
 #endif

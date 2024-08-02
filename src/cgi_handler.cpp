@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 16:05:11 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/02 17:16:53 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ std::string	execCGI(Request &request, const Socket &socket)
 	std::string	query_string = "QUERY_STRING=" + request.getQuery();
 	std::string	content_length = "CONTENT_LENGTH=" + strSizeToStr(request.getBody());
 	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
-	std::string cgi_handler = socket.getCgiHandler(extension);
+	// NE COMPILE PAS CAR CGI DANS LOCATION
+	// std::string cgi_handler = socket.getCgiHandler(extension);
+	std::string cgi_handler = "/usr/bin/php-cgi";
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
 	std::string	path = request.getPath();
