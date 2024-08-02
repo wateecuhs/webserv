@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:27:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 13:56:17 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 14:33:33 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef enum e_conf_state {
 } ConfState;
 
 typedef enum e_location_state {
+	loc_semicolon,
 	loc_brace_open,
 	loc_brace_close,
 	loc_new_token,

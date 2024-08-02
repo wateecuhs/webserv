@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 17:39:44 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 15:59:01 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,13 @@ class Location
 		std::string							_path;
 		std::string							_root;
 		bool								_useCGI;
+		bool								_autoindex;
+		std::string							_default_file;
 		std::map<std::string, std::string>	_CGI_map;
-		int									_body_size;
+		bool								_methods[3];
+		bool								_file_upload;
+		std::string							_upload_path;
+		std::string							_http_redirection;
 		Location();
 	public:
 		Location(std::stringstream &iss, std::string word);
@@ -37,8 +42,20 @@ class Location
 		std::string							getRoot() const;
 		void								setUseCGI(bool useCGI);
 		bool								getUseCGI() const;
-
-
+		void								setMethod(std::string method);
+		bool								*getMethods();
+		void								setAutoindex(bool autoindex);
+		bool								getAutoindex() const;
+		void								setDefaultFile(std::string default_file);
+		std::string							getDefaultFile() const;
+		void								setFileUpload(bool file_upload);
+		bool								getFileUpload() const;
+		void								setUploadPath(std::string upload_path);
+		std::string							getUploadPath() const;
+		void								setHttpRedirection(std::string http_redirection);
+		std::string							getHttpRedirection() const;
+		std::string							getPath() const;
+		void								setPath(std::string path);
 };
 
 #endif

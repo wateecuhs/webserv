@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/01 17:30:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 15:57:48 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ class Socket
 		std::map<int, std::string>			getErrorPages() const;
 		void								setBodySize(int size);
 		int									getBodySize() const;
+		void								addLocation(Location location);
+		std::vector<Location>				getLocations() const;
 };
 
 class InvalidConfigFile: public std::exception

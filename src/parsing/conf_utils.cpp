@@ -6,7 +6,7 @@
 /*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 14:28:07 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 13:28:05 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/02 16:15:45 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,5 +108,127 @@ bool validateLocation(std::string path)
 		if (!isalnum(*it) && *it != '/' && *it != '_' &&  *it != '-' && *it != '.')
 			return false;
 	}
+	return true;
+}
+
+bool validateRoot(std::string path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0) {
+		if (!(s.st_mode & S_IFDIR) || access(path.c_str(), R_OK) == -1)
+			return false;
+	}
+	else
+		return false;
+	return true;
+}
+
+bool validateDefaultFile(std::string path)
+{
+	if (path.find("/") != std::string::npos || path.find("..") != std::string::npos || path.size() < 1)
+		return false;
+	return true;
+}
+
+bool validateUploadPath(std::string path)
+{
+	struct stat s;
+
+	if (stat(path.c_str(), &s) == 0) {
+		if (!(s.st_mode & S_IFDIR) || access(path.c_str(), R_OK) == -1)
+			return false;
+	}
+	else
+		return false;
+	return true;
+}
+
+bool validateCGIPath(std::string path)
+{
+	struct stat s;
+	if (stat(path.c_str(), &s) == 0) {
+		if (!(s.st_mode & S_IFREG) || access(path.c_str(), R_OK) == -1)
+			return false;
+	}
+	else
+		return false;
+	return true;
+}
+
+LocationState verifyAddCGIExtension(std::string word, std::stringstream &iss, Location &location)
+{
+	std::string extension = word;
+	std::string cgi_path;
+
+	if (extension.size() < 2 || extension[0] != '.' || extension[extension.size() - 1] == ';')
+		throw BadInput();
+	for (std::string::iterator it = extension.begin() + 1; it != extension.end(); it++)
+	{
+		if (!isalpha(*it))
+			throw BadInput();
+	}
+	iss >> word;
+	if (word[word.size() - 1] == ';')
+		cgi_path = word.substr(0, word.size() - 1);
+	else
+		cgi_path = word;
+	if (!validateCGIPath(cgi_path))
+		throw BadInput();
+	location.addCGIExtension(extension, cgi_path);
+	return word[word.size() - 1] == ';' ? loc_new_token : loc_semicolon;
+}
+
+bool validateURI(const std::string& uri)
+{
+	if (uri.empty()) {
+		return false;
+	}
+
+	size_t colonPos = uri.find(':');
+	if (colonPos == std::string::npos) {
+		return false;
+	}
+
+	std::string scheme = uri.substr(0, colonPos);
+	if (scheme.empty()) {
+		return false;
+	}
+	for (size_t i = 0; i < scheme.length(); ++i) {
+		char c = scheme[i];
+		if (!(isalpha(c) || (i > 0 && (isdigit(c) || c == '+' || c == '-' || c == '.')))) {
+			return false;
+		}
+	}
+
+	std::string remaining = uri.substr(colonPos + 1);
+	if (remaining.substr(0, 2) == "//") {
+		size_t authorityEnd = remaining.find('/', 2);
+		if (authorityEnd == std::string::npos) {
+			authorityEnd = remaining.length();
+		}
+		std::string authority = remaining.substr(2, authorityEnd - 2);
+		
+		for (size_t i = 0; i < authority.length(); ++i) {
+			char c = authority[i];
+			if (!(isalnum(c) || c == '.' || c == '-' || c == '_' || c == '~' || c == '%' || c == '!' || 
+				  c == '$' || c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' || c == '+' || 
+				  c == ',' || c == ';' || c == '=' || c == ':' || c == '@')) {
+				return false;
+			}
+		}
+		remaining = remaining.substr(authorityEnd);
+	}
+
+	for (size_t i = 0; i < remaining.length(); ++i) {
+		char c = remaining[i];
+		if (!(isalnum(c) || c == '/' || c == '?' || c == '#' || c == '[' || c == ']' || c == '@' || 
+			  c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' || c == ')' || c == '*' || 
+			  c == '+' || c == ',' || c == ';' || c == '=' || c == '-' || c == '.' || c == '_' || 
+			  c == '~' || c == '%')) {
+			return false;
+		}
+	}
+
 	return true;
 }
