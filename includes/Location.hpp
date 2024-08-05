@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 15:59:01 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/05 16:52:56 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,10 @@
 # define LOCATION_HPP
 
 #include <string>
+#include "Socket.hpp"
 #include <map>
+
+class Socket;
 
 class Location
 {
@@ -29,15 +32,17 @@ class Location
 		bool								_file_upload;
 		std::string							_upload_path;
 		std::string							_http_redirection;
+		Socket								&_socket;
 		Location();
 	public:
-		Location(std::stringstream &iss, std::string word);
-		~Location();
+		Location(std::stringstream &iss, std::string word, Socket &socket);
 		Location(const Location &copy);
 		Location &operator=(const Location &copy);
-	
+		~Location();
+
 		void								addCGIExtension(std::string extension, std::string path);
 		std::map<std::string, std::string>	getCGIMap() const;
+		std::string							getCGIPath(std::string extension) const;
 		void								setRoot(std::string root);
 		std::string							getRoot() const;
 		void								setUseCGI(bool useCGI);

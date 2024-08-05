@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exceptions.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:33:44 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:55 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/05 17:11:47 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@ class Forbidden403: public std::exception {
 };
 
 class NotFound404: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+
+class MethodNotAllowed405: public std::exception {
 	public:
 		virtual const char *what() const throw();
 };

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:12:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/05 16:44:43 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 #include <sys/stat.h>
 #include "exceptions.hpp"
 
-Request::Request() {}
 
 Request::Request(std::string request)
 {
@@ -156,4 +155,19 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
+}
+
+void Request::setLocation(Location *location)
+{
+	this->_location = location;
+}
+
+Location *Request::getLocation() const
+{
+	return this->_location;
+}
+
+Socket &Request::getSocket() const
+{
+	return this->_socket;
 }

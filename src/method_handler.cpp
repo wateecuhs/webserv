@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 17:17:28 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/05 18:47:36 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,29 +19,63 @@
 #include <sys/socket.h>
 #include <string>
 #include <sstream>
+#include <dirent.h>
 
-std::string	execCGI(Request &request, const Socket &socket);
-void		handleCGI(Request &request, const Socket &socket);
+std::string	execCGI(Request &request);
+void		handleCGI(Request &request);
 
-void handleGetRequest(Request &request, const Socket &socket) {
-	std::string path = request.getPath();
+std::string	listDirectory(const std::string &path) {
+	std::string response = "<html><head><title>Index of " + path + "</title></head><body><h1>Index of " + path + "</h1><ul>";
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(path.c_str())) != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			response += "<li><a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a></li>";
+		}
+		closedir(dir);
+	}
+	response += "</ul></body></html>";
+	return response;
+}
+
+// void handleGetRequest(Request &request, const Socket &socket) {
+void handleGetRequest(Request &request) {
+	std::string 	path = request.getPath();
+	Location 		*location = request.getLocation();
+	Socket 			socket = request.getSocket();
 
 	if (request.pathIsDirectory()){
-		std::string indexPath = path + "/index";
-		std::string extensions[] = {".html", ".php", ".xml"};
-		for (size_t i = 0; i < 3; i++) {
-			std::ifstream indexFile((indexPath + extensions[i]).c_str());
-			if (indexFile) {
-				std::string content((std::istreambuf_iterator<char>(indexFile)),
-									std::istreambuf_iterator<char>());
+		std::string indexPath = path;
+
+		// location->getDefaultFile().empty() ? indexPath += "/index.html" : indexPath += "/" + location->getDefaultFile();
+
+		// std::string extensions[] = {".html", ".php", ".xml"};
+		// for (size_t i = 0; i < 3; i++) {
+		// std::ifstream indexFile((indexPath + extensions[i]).c_str());
+		if (!location->getDefaultFile().empty())
+			indexPath += "/" + location->getDefaultFile();
+		else if (location->getAutoindex())
+		{
+			indexPath += "/index.html";
+
+			std::ifstream indexFile(indexPath.c_str());
+			if (indexFile){
+				std::string content((std::istreambuf_iterator<char>(indexFile)), std::istreambuf_iterator<char>());
 				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 				if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
 					throw InternalServerError500();
-				indexFile.close();
-				return;
 			}
+			else{
+				std::string content = listDirectory(path);
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+				if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+					throw InternalServerError500();
+			}
+			indexFile.close();
+			return;
 		}
-		throw NotFound404();
+		else
+			throw BadRequest();
 	}
 
 	std::ifstream file(path.c_str());
@@ -57,11 +91,11 @@ void handleGetRequest(Request &request, const Socket &socket) {
 
 	std::string	file_extension = path.substr(path.find_last_of('.'));
 	// NE COMPILE PAS CAR LES CGI SE TROUVENT DANS LOCATION
-	// if (socket.usesCGI() && !socket.getCgiHandler(file_extension).empty()){
-	// 	handleCGI(request, socket);
-	// 	file.close();
-	// 	return ;
-	// }
+	if (location->getUseCGI() && !location->getCGIPath(file_extension).empty()){
+		handleCGI(request);
+		file.close();
+		return ;
+	}
 
 	std::string content((std::istreambuf_iterator<char>(file)),
 						 std::istreambuf_iterator<char>());
@@ -70,7 +104,8 @@ void handleGetRequest(Request &request, const Socket &socket) {
 	file.close();
 }
 
-void handlePostRequest(Request &request, const Socket &socket) {
+// void handlePostRequest(Request &request, const Socket &socket) {
+void handlePostRequest(Request &request) {
 	std::string path = request.getPath();
 	if (request.pathIsDirectory())
 		path += "/uploadedData.txt";
@@ -110,7 +145,8 @@ void handlePostRequest(Request &request, const Socket &socket) {
 	file.close();
 }
 
-void	handleDeleteRequest(const Request &request, const Socket &socket) {
+// void	handleDeleteRequest(const Request &request, const Socket &socket) {
+void	handleDeleteRequest(Request &request) {
 	std::string path = request.getPath();
 	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
@@ -118,16 +154,26 @@ void	handleDeleteRequest(const Request &request, const Socket &socket) {
 	send(socket.getFd(), response.c_str(), response.size(), 0);
 }
 
-void methodHandler(Request& request, const Socket &socket) {
+// void methodHandler(Request& request, const Socket &socket) {
+void methodHandler(Request& request) {
+	Location 	*location = request.getLocation();
+	bool		*allowed_methods = location->getMethods();
+
 	switch (request.getMethod()) {
 		case GET:
-			handleGetRequest(request, socket);
+			if (!allowed_methods[GET])
+				throw MethodNotAllowed405();
+			handleGetRequest(request);
 			break;
 		case POST:
-			handlePostRequest(request, socket);
+			if (!allowed_methods[POST])
+				throw MethodNotAllowed405();
+			handlePostRequest(request);
 			break;
 		case DELETE:
-			handleDeleteRequest(request, socket);
+			if (!allowed_methods[DELETE])
+				throw MethodNotAllowed405();
+			handleDeleteRequest(request);
 			break;
 		default:
 			throw BadRequest();

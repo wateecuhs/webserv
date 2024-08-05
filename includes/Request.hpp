@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:49 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/05 16:44:24 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,14 @@
 # define REQUEST_HPP
 
 #include "enums.hpp"
+#include "Location.hpp"
+#include "Socket.hpp"
 #include <map>
 #include <iostream>
 #include <exception>
+
+class Location;
+class Socket;
 
 class Request {
 	private:
@@ -29,9 +34,11 @@ class Request {
 		std::string							_body;
 		std::string							_query;
 
+		Location							*_location;
+		Socket								&_socket;
 		Request();
-	public:
 		Request(Request &src);
+	public:
 		Request(std::string request);
 		~Request();
 		Methods								getMethod() const;
@@ -50,6 +57,9 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
+		void								setLocation(Location *location);
+		Location							*getLocation() const;
+		Socket								&getSocket() const;
 
 		bool								pathIsDirectory() const;
 };
