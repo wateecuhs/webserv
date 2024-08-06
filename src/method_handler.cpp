@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/06 21:22:18 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/06 23:09:14 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,15 @@ void handleGetRequest(Request &request) {
 		return ;
 	}
 
-	if (location){
-		if (location->getRoot().empty())
-			path = location->getPath() + request.getPath();
-		else
-			path = location->getPath() + location->getRoot() + request.getPath();
-	}
+	if (location)
+		path = location->getPath() + location->getRoot() + request.getPath();
 	else
 		path = request.getPath();
 
-	request.setPath(path);			// yolo
+	// request.setPath(path);			// yolo
 
-	if (request.pathIsDirectory()){
+	// if (request.pathIsDirectory()){
+	if (pathIsDirectory(path)){
 		std::string indexPath = path;
 
 		// location->getDefaultFile().empty() ? indexPath += "/index.html" : indexPath += "/" + location->getDefaultFile();
@@ -124,9 +121,10 @@ void handleGetRequest(Request &request) {
 }
 
 void	handleUpload(Request &request) {
-	// std::string	path = request.getPath();
+	// std::string	path; // = request.getPath();
 	Location 	*location = request.getLocation();
 	Socket 		socket = request.getSocket();
+	std::string path = location->getPath() + location->getRoot() + request.getPath();
 
 	// if (request.pathIsDirectory()) {
 	// 	path += "/uploadedData.txt";
@@ -134,31 +132,45 @@ void	handleUpload(Request &request) {
     //     path = location->getUploadPath() + "/" + path.substr(path.find_last_of('/') + 1);
     // }
 
-	path += "/" + location->getUploadPath();
+
+	if (pathIsDirectory(path))
+		throw BadRequest();
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
     if (!file) {
         throw InternalServerError500();
     }
 
+	if (access(path.c_str(), W_OK) == -1){
+		file.close();
+		throw Forbidden403();
+	}
+
     std::string body = request.getBody();
     file << body;
     file.close();
 
     std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-    send(socket.getFd(), response.c_str(), response.size(), 0);
+    if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
 }
 
 // void handlePostRequest(Request &request, const Socket &socket) {
 void handlePostRequest(Request &request) {
-	std::string path = request.getPath();
+	std::string path; //= request.getPath();
 	Location 	*location = request.getLocation();
 	Socket 		socket = request.getSocket();
-1
-	if (request.pathIsDirectory()){
 
+	if (location && location->getFileUpload())
+		return handleUpload(request);
+
+	if (location)
+		path = location->getPath() + location->getRoot() + request.getPath();
+	else
+		path = request.getPath();
+
+	if (pathIsDirectory(path))
 		path += "/uploadedData.txt";
-	}
 
 	std::ofstream file(path.c_str(), std::ios::out | std::ios::app);
 
@@ -203,12 +215,8 @@ void	handleDeleteRequest(Request &request) {
 	Socket 		socket = request.getSocket();
 	Location 	*location = request.getLocation();
 
-	if (location){
-		if (location->getRoot().empty())
-			path = location->getPath() + request.getPath();
-		else
-			path = location->getPath() + location->getRoot() + request.getPath();
-	}
+	if (location)
+		path = location->getPath() + location->getRoot() + request.getPath();
 	else
 		path = request.getPath();
 
