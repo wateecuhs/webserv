@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/06 23:22:49 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/06 23:39:06 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <sstream>
 
-std::string	execCGI(Request &request)
+static std::string	execCGI(Request &request)
 {
 	Socket		socket = request.getSocket();
 	Location	*location = request.getLocation();
@@ -33,11 +33,7 @@ std::string	execCGI(Request &request)
 	std::string	query_string = "QUERY_STRING=" + request.getQuery();
 	std::string	content_length = "CONTENT_LENGTH=" + strSizeToStr(request.getBody());
 	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
-	// NE COMPILE PAS CAR CGI DANS LOCATION
-	// std::string cgi_handler = socket.getCgiHandler(extension);
-	// std::string cgi_handler = "/usr/bin/php-cgi";
 	std::string cgi_handler = location->getCGIPath(extension);
-
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
 	std::string	path = location->getPath() + location->getRoot() + request.getPath();

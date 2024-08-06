@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/06 23:09:14 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/06 23:38:04 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,9 @@
 #include <sstream>
 #include <dirent.h>
 
-std::string	execCGI(Request &request);
-void		handleCGI(Request &request);
+void	handleCGI(Request &request);
 
-std::string	listDirectory(const std::string &path) {
+static std::string	listDirectory(const std::string &path) {
 	std::string response = "<html><head><title>Index of " + path + "</title></head><body><h1>Index of " + path + "</h1><ul>";
 	DIR *dir;
 	struct dirent *ent;
@@ -38,11 +37,9 @@ std::string	listDirectory(const std::string &path) {
 	return response;
 }
 
-// void handleGetRequest(Request &request, const Socket &socket) {
-void handleGetRequest(Request &request) {
-	std::string 	path; // = request.getPath();
-	Location 		*location = request.getLocation();
-	Socket 			socket = request.getSocket();
+static void handleGetRequest(Request &request) {
+	Location	*location = request.getLocation();
+	Socket		socket = request.getSocket();
 
 	if (location && !location->getHttpRedirection().empty()){
 		std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: " + location->getHttpRedirection() + "\r\nContent-Length: 0\r\n\r\n";
@@ -51,22 +48,12 @@ void handleGetRequest(Request &request) {
 		return ;
 	}
 
-	if (location)
-		path = location->getPath() + location->getRoot() + request.getPath();
-	else
-		path = request.getPath();
+	std::string path;
+	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
 
-	// request.setPath(path);			// yolo
-
-	// if (request.pathIsDirectory()){
 	if (pathIsDirectory(path)){
 		std::string indexPath = path;
 
-		// location->getDefaultFile().empty() ? indexPath += "/index.html" : indexPath += "/" + location->getDefaultFile();
-
-		// std::string extensions[] = {".html", ".php", ".xml"};
-		// for (size_t i = 0; i < 3; i++) {
-		// std::ifstream indexFile((indexPath + extensions[i]).c_str());
 		if (location && !location->getDefaultFile().empty())
 			indexPath += "/" + location->getDefaultFile();
 		else if (location && location->getAutoindex())
@@ -113,33 +100,24 @@ void handleGetRequest(Request &request) {
 		}
 	}
 
-	std::string content((std::istreambuf_iterator<char>(file)),
-						 std::istreambuf_iterator<char>());
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-	send(socket.getFd(), response.c_str(), response.size(), 0);
 	file.close();
+	if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
 }
 
-void	handleUpload(Request &request) {
-	// std::string	path; // = request.getPath();
+static void	handleUpload(Request &request) {
 	Location 	*location = request.getLocation();
 	Socket 		socket = request.getSocket();
 	std::string path = location->getPath() + location->getRoot() + request.getPath();
-
-	// if (request.pathIsDirectory()) {
-	// 	path += "/uploadedData.txt";
-	// } else {
-    //     path = location->getUploadPath() + "/" + path.substr(path.find_last_of('/') + 1);
-    // }
-
 
 	if (pathIsDirectory(path))
 		throw BadRequest();
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
-    if (!file) {
+    if (!file)
         throw InternalServerError500();
-    }
 
 	if (access(path.c_str(), W_OK) == -1){
 		file.close();
@@ -149,25 +127,20 @@ void	handleUpload(Request &request) {
     std::string body = request.getBody();
     file << body;
     file.close();
-
     std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
     if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
 		throw InternalServerError500();
 }
 
-// void handlePostRequest(Request &request, const Socket &socket) {
-void handlePostRequest(Request &request) {
-	std::string path; //= request.getPath();
+static void handlePostRequest(Request &request) {
 	Location 	*location = request.getLocation();
 	Socket 		socket = request.getSocket();
 
 	if (location && location->getFileUpload())
 		return handleUpload(request);
 
-	if (location)
-		path = location->getPath() + location->getRoot() + request.getPath();
-	else
-		path = request.getPath();
+	std::string	path;
+	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
 
 	if (pathIsDirectory(path))
 		path += "/uploadedData.txt";
@@ -182,9 +155,10 @@ void handlePostRequest(Request &request) {
 		}
 		std::string body = request.getBody();
 		file << body;
-		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-		send(socket.getFd(), response.c_str(), response.size(), 0);
 		file.close();
+		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+		if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+			throw InternalServerError500();
 		return ;
 	}
 
@@ -204,21 +178,18 @@ void handlePostRequest(Request &request) {
 
 	std::string body = request.getBody() + "\n";
 	file << body;
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-	send(socket.getFd(), response.c_str(), response.size(), 0);
 	file.close();
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+	if (send(socket.getFd(), response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
 }
 
-// void	handleDeleteRequest(const Request &request, const Socket &socket) {
-void	handleDeleteRequest(Request &request) {
-	std::string	path; // = request.getPath();
+static void	handleDeleteRequest(Request &request) {
 	Socket 		socket = request.getSocket();
 	Location 	*location = request.getLocation();
 
-	if (location)
-		path = location->getPath() + location->getRoot() + request.getPath();
-	else
-		path = request.getPath();
+	std::string	path;
+	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
 
 	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
@@ -227,10 +198,8 @@ void	handleDeleteRequest(Request &request) {
 		throw InternalServerError500();
 }
 
-// void methodHandler(Request& request, const Socket &socket) {
 void methodHandler(Request& request) {
-	Location 	*location = request.getLocation();
-	bool		*allowed_methods = location->getMethods();
+	bool	*allowed_methods = request.getLocation()->getMethods();
 
 	switch (request.getMethod()) {
 		case GET:
@@ -252,4 +221,3 @@ void methodHandler(Request& request) {
 			throw BadRequest();
 	}
 }
-
