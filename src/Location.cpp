@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:59:54 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/06 12:27:12 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "parsing.hpp"
 #include "exceptions.hpp"
 
-Location::Location(std::stringstream &iss, std::string word, Socket &socket): _socket(socket)
+Location::Location(std::stringstream &iss, std::string word)
 {
 	LocationState	state = loc_brace_open;
 	std::string		shaved_word;
@@ -26,6 +26,7 @@ Location::Location(std::stringstream &iss, std::string word, Socket &socket): _s
 	for (int i = 0; i < 3; i++)
 		this->_methods[i] = false;
 	this->_path = word;
+	std::cout << "Location path: " << this->_path << std::endl;
 
 	while (iss >> word)
 	{
@@ -134,7 +135,7 @@ Location::~Location()
 {
 }
 
-Location::Location(const Location &copy): _socket(copy._socket)
+Location::Location(const Location &copy)
 {
 	this->_path = copy._path;
 	this->_root = copy._root;
@@ -166,7 +167,6 @@ Location &Location::operator=(const Location &copy)
 	this->_file_upload = copy._file_upload;
 	this->_upload_path = copy._upload_path;
 	this->_http_redirection = copy._http_redirection;
-	this->_socket = copy._socket;
 	return *this;
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:59:07 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/06 12:32:58 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,10 @@ class Request {
 		Location							*_location;
 		Socket								&_socket;
 		Request();
-		Request(Request &src);
 	public:
-		Request(std::string request);
+		Request(std::string request, Socket &socket);
+		Request(Request &src);
+		Request &operator=(Request &src);
 		~Request();
 		Methods								getMethod() const;
 		std::string							getMethodString() const;
@@ -57,7 +58,8 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-
+		void								setLocation(Location *location);
+		Location							*getLocation();
 		bool								pathIsDirectory() const;
 };
 

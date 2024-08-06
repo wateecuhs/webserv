@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:53:42 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/06 12:27:08 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,9 @@ class Location
 		bool								_file_upload;
 		std::string							_upload_path;
 		std::string							_http_redirection;
-		Socket								&_socket;
 		Location();
 	public:
-		Location(std::stringstream &iss, std::string word, Socket &socket);
+		Location(std::stringstream &iss, std::string word);
 		Location(const Location &copy);
 		Location &operator=(const Location &copy);
 		~Location();
