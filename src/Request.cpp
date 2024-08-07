@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:12:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/07 13:00:22 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,41 +17,61 @@
 #include <sys/stat.h>
 #include "exceptions.hpp"
 
-Request::Request() {}
 
-Request::Request(std::string request)
+Request::Request(std::string request, Socket &socket): _socket(socket)
 {
-	size_t headers_start;
-	size_t headers_end;
+	size_t	headers_start;
+	size_t	headers_end;
+	size_t	longest_length = 0;
+	
 	headers_start = request.find("\r\n");
+	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
 		throw BadRequest();
-	parseRequestLine(request.substr(0, headers_start), *this);
-
-	std::cout << "Method found -> " << this->_method << std::endl;
-	std::cout << "Path found -> " << this->_path << std::endl;
-	std::cout << "Version found -> " << this->_http_version << std::endl;
-
 	headers_start += 2;
-	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
 		throw BadRequest();
-	parseHeaders(request.substr(headers_start, headers_end), *this);
 
-	std::cout << "Headers found -> " << std::endl;
-	for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); it++)
-		std::cout << it->first << ": " << it->second << std::endl;
+	parseRequestLine(request.substr(0, headers_start), *this);
+	parseHeaders(request.substr(headers_start, headers_end), *this);
 	setHost(this->_headers["Host"]);
+
+
+	for (std::vector<Location>::iterator it = socket.getLocations().begin(); it != socket.getLocations().end(); it++)
+	{
+		if (this->_path.rfind(it->getPath(), 0) == 0 && it->getPath().length() > longest_length)
+		{
+			longest_length = it->getPath().length();
+			this->_location = new Location(*it);
+		}
+	}
 	setBody(request.substr(headers_end + 4));
-	std::cout << "Body found -> " << this->_body << std::endl;
 }
 
-Request::Request(Request &src)
+Request::~Request()
+{
+	if (this->_location)
+		delete this->_location;
+}
+
+Request::Request(Request &src): _socket(src._socket)
 {
 	*this = src;
 }
 
-Request::~Request() {}
+Request &Request::operator=(Request &src)
+{
+	this->_method = src.getMethod();
+	this->_path = src.getPath();
+	this->_pathIsDirectory = src.pathIsDirectory();
+	this->_http_version = src.getHTTPVersion();
+	this->_headers = src.getHeaders();
+	this->_body = src.getBody();
+	this->_host = src.getHost();
+	this->_query = src.getQuery();
+	this->_location = src.getLocation();
+	return *this;
+}
 
 void Request::setMethod(Methods method)
 {
@@ -156,4 +176,14 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
+}
+
+void Request::setLocation(Location *location)
+{
+	this->_location = location;
+}
+
+Location *Request::getLocation()
+{
+	return this->_location;
 }

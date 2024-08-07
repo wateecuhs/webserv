@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:11:46 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/07 13:05:29 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,19 @@
 #include "enums.hpp"
 #include "parsing.hpp"
 #include "exceptions.hpp"
+#include <netinet/in.h>
+#include <unistd.h>
+#include <poll.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <cstring>
+#include <sys/socket.h>
 
 Socket::Socket(std::stringstream &iss, std::string word)
 {
 	ConfState		state = conf_new_token;
+	_locations = std::vector<Location>();
 	std::string		shaved_word;
 	bool			trailing_semicolon;
 
@@ -93,6 +102,27 @@ Socket::Socket(std::stringstream &iss, std::string word)
 		}
 	}
 	throw InvalidConfigFile();
+}
+
+int Socket::startListening(int epfd, epoll_event &ep_event)
+{
+	sockaddr_in server_addr;
+	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(_port);
+	if (_host == "*")
+		server_addr.sin_addr.s_addr = INADDR_ANY;
+	else
+		inet_aton(_host.c_str(), &server_addr.sin_addr);
+
+	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
+	
+	ep_event.data.fd = this->_fd;
+	ep_event.events = EPOLLIN | EPOLLPRI;
+	epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &ep_event);
+	listen(this->_fd, 5);
+	return (this->_fd);
 }
 
 Socket::~Socket()

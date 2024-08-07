@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:12 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/06 12:16:57 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 #include <map>
 #include <vector>
 #include "Location.hpp"
+#include <sys/epoll.h>
+
+class Location;
 
 class Socket
 {
@@ -28,8 +31,6 @@ class Socket
 		std::vector<std::string>			_server_names;
 		int									_body_size;
 		std::vector<Location>				_locations;
-
-	public:
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);
@@ -51,6 +52,7 @@ class Socket
 		int									getBodySize() const;
 		void								addLocation(Location location);
 		std::vector<Location>				getLocations() const;
+		int 								startListening(int epfd, epoll_event &ep_event);
 };
 
 #endif
