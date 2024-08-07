@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:32:54 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 13:00:22 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	size_t	headers_start;
 	size_t	headers_end;
 	size_t	longest_length = 0;
-	std::vector<Location> locations;
 	
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
@@ -37,22 +36,23 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	parseHeaders(request.substr(headers_start, headers_end), *this);
 	setHost(this->_headers["Host"]);
 
-	locations = this->_socket.getLocations();
-	std::cout << "locations size: " << locations.size() << std::endl;
-	for (size_t i = 0; i < locations.size(); i++)
+
+	for (std::vector<Location>::iterator it = socket.getLocations().begin(); it != socket.getLocations().end(); it++)
 	{
-		std::cout << "test " << locations[i].getPath() << std::endl;
-		if (this->_path.rfind(locations[i].getPath(), 0) == 0 && locations[i].getPath().length() > longest_length)
+		if (this->_path.rfind(it->getPath(), 0) == 0 && it->getPath().length() > longest_length)
 		{
-			longest_length = locations[i].getPath().length();
-			this->_location = &locations[i];
-			std::cout << "Location path: " << this->_location->getPath() << std::endl;
+			longest_length = it->getPath().length();
+			this->_location = new Location(*it);
 		}
 	}
 	setBody(request.substr(headers_end + 4));
 }
 
-Request::~Request() {}
+Request::~Request()
+{
+	if (this->_location)
+		delete this->_location;
+}
 
 Request::Request(Request &src): _socket(src._socket)
 {

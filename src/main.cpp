@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:33:22 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 13:00:34 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ void startSockets(std::vector<Socket> servers)
 						if (it->getFd() == ep_events[it - servers.begin()].data.fd)
 						{
 							Request rq(buf, *it);
-							std::cout << "after rq " << rq.getLocation()->getPath() << std::endl;
 							break;
 						}
 					}
