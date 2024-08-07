@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:16:57 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:46:29 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,10 @@ class Socket
 		std::vector<std::string>			_server_names;
 		int									_body_size;
 		std::vector<Location>				_locations;
+		int									_epoll_fd;
+		struct epoll_event					_event;
+		struct epoll_event					_events[10];
+		
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);
@@ -52,7 +56,8 @@ class Socket
 		int									getBodySize() const;
 		void								addLocation(Location location);
 		std::vector<Location>				getLocations() const;
-		int 								startListening(int epfd, epoll_event &ep_event);
+		int 								startListening();
+		void								httpListen();
 };
 
 #endif

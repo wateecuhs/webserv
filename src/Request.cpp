@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:00:22 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 14:56:11 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 
 	for (std::vector<Location>::iterator it = socket.getLocations().begin(); it != socket.getLocations().end(); it++)
 	{
+		std::cout << "Comparing " << this->_path << " with " << it->getPath() << std::endl;
 		if (this->_path.rfind(it->getPath(), 0) == 0 && it->getPath().length() > longest_length)
 		{
 			longest_length = it->getPath().length();
