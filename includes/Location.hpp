@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:20:27 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:40:23 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class Location
 		bool								getUseCGI() const;
 		void								setMethod(std::string method);
 		bool								*getMethods();
+		bool								getMethod(int method) const;
 		void								setAutoindex(bool autoindex);
 		bool								getAutoindex() const;
 		void								setDefaultFile(std::string default_file);

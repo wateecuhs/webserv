@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:17:34 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:45:45 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,12 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	size_t	headers_end;
 	size_t	longest_length = 0;
 
+	size_t					headers_start;
+	size_t					headers_end;
+	size_t					longest_length = 0;
+	std::vector<Location>	locations;
+	std::string				tmp_path;
+
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -36,13 +42,14 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	parseHeaders(request.substr(headers_start, headers_end), *this);
 	setHost(this->_headers["Host"]);
 
-
-	for (std::vector<Location>::iterator it = socket.getLocations().begin(); it != socket.getLocations().end(); it++)
+	locations = this->_socket.getLocations();
+	for (size_t i = 0; i < locations.size(); i++)
 	{
-		if (this->_path.rfind(it->getPath(), 0) == 0 && it->getPath().length() > longest_length)
+		tmp_path = locations[i].getPath();
+		if (this->_path.rfind(tmp_path, 0) == 0 && tmp_path.length() > longest_length)
 		{
-			longest_length = it->getPath().length();
-			this->_location = new Location(*it);
+			longest_length = tmp_path.length();
+			this->_location = new Location(locations[i]);
 		}
 	}
 	setBody(request.substr(headers_end + 4));
@@ -69,7 +76,9 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
-	this->_location = src.getLocation();
+	if (this->_location)
+		delete this->_location;
+	this->_location = new Location(*src.getLocation());
 	return *this;
 }
 

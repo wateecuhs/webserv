@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/07 13:16:47 by alermolo         ###   ########.fr       */
+/*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
+/*   Updated: 2024/08/07 15:43:20 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,37 +137,36 @@ Location::~Location()
 
 Location::Location(const Location &copy): _socket(copy._socket)
 {
-	this->_path = copy._path;
-	this->_root = copy._root;
-	this->_useCGI = copy._useCGI;
-	this->_CGI_map = copy._CGI_map;
-	this->_autoindex = copy._autoindex;
-	this->_default_file = copy._default_file;
-	this->_methods[0] = copy._methods[0];
-	this->_methods[1] = copy._methods[1];
-	this->_methods[2] = copy._methods[2];
-	this->_file_upload = copy._file_upload;
-	this->_upload_path = copy._upload_path;
-	this->_http_redirection = copy._http_redirection;
+	this->_path = copy.getPath();
+	this->_root = copy.getRoot();
+	this->_useCGI = copy.getUseCGI();
+	this->_CGI_map = copy.getCGIMap();
+	this->_autoindex = copy.getAutoindex();
+	this->_default_file = copy.getDefaultFile();
+	this->_methods[0] = copy.getMethod(0);
+	this->_methods[1] = copy.getMethod(1);
+	this->_methods[2] = copy.getMethod(2);
+	this->_file_upload = copy.getFileUpload();
+	this->_upload_path = copy.getUploadPath();
+	this->_http_redirection = copy.getHttpRedirection();
 }
 
 Location &Location::operator=(const Location &copy)
 {
 	if (this == &copy)
 		return *this;
-	this->_path = copy._path;
-	this->_root = copy._root;
-	this->_useCGI = copy._useCGI;
-	this->_CGI_map = copy._CGI_map;
-	this->_autoindex = copy._autoindex;
-	this->_default_file = copy._default_file;
-	this->_methods[0] = copy._methods[0];
-	this->_methods[1] = copy._methods[1];
-	this->_methods[2] = copy._methods[2];
-	this->_file_upload = copy._file_upload;
-	this->_upload_path = copy._upload_path;
-	this->_http_redirection = copy._http_redirection;
-	this->_socket = copy._socket;
+	this->_path = copy.getPath();
+	this->_root = copy.getRoot();
+	this->_useCGI = copy.getUseCGI();
+	this->_CGI_map = copy.getCGIMap();
+	this->_autoindex = copy.getAutoindex();
+	this->_default_file = copy.getDefaultFile();
+	this->_methods[0] = copy.getMethod(0);
+	this->_methods[1] = copy.getMethod(1);
+	this->_methods[2] = copy.getMethod(2);
+	this->_file_upload = copy.getFileUpload();
+	this->_upload_path = copy.getUploadPath();
+	this->_http_redirection = copy.getHttpRedirection();
 	return *this;
 }
 
@@ -224,6 +223,13 @@ void Location::setMethod(std::string method)
 bool *Location::getMethods()
 {
 	return this->_methods;
+}
+
+bool Location::getMethod(int method) const
+{
+	if (method < 0 || method > 2)
+		return false;
+	return this->_methods[method];
 }
 
 void Location::setAutoindex(bool autoindex)
