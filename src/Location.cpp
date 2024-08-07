@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:27:12 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 13:03:56 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ Location::Location(std::stringstream &iss, std::string word)
 	for (int i = 0; i < 3; i++)
 		this->_methods[i] = false;
 	this->_path = word;
-	std::cout << "Location path: " << this->_path << std::endl;
 
 	while (iss >> word)
 	{
