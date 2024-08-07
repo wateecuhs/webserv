@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/05 16:44:24 by alermolo         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2024/08/07 13:13:08 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
@@ -16,9 +17,14 @@
 #include "enums.hpp"
 #include "Location.hpp"
 #include "Socket.hpp"
+#include "Location.hpp"
+#include "Socket.hpp"
 #include <map>
 #include <iostream>
 #include <exception>
+
+class Location;
+class Socket;
 
 class Location;
 class Socket;
@@ -36,10 +42,13 @@ class Request {
 
 		Location							*_location;
 		Socket								&_socket;
+		Location							*_location;
+		Socket								&_socket;
 		Request();
-		Request(Request &src);
 	public:
-		Request(std::string request);
+		Request(std::string request, Socket &socket);
+		Request(Request &src);
+		Request &operator=(Request &src);
 		~Request();
 		Methods								getMethod() const;
 		std::string							getMethodString() const;

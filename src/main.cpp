@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:49:11 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/07 13:05:41 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <arpa/inet.h>
 #include <cstring>
 
-void methodHandler(Request &request, const Socket &socket);
+void	methodHandler(Request &request, const Socket &socket);
 void	handleCGI(const Request &request, const Socket &socket);
 
 int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
@@ -45,49 +45,36 @@ int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
 	return (socketfd);
 }
 
-int main(int argc, char **argv)
+void startSockets(std::vector<Socket> servers)
 {
-	std::vector<Socket> servers;
-	
-	try {
-		servers = parseConfig("config_tests/test1.config");
-	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-		return 1;
-	}
-	(void)argc, (void)argv;
-	int			fds[2];
-	char		buf[2048] = {0};
-	int			client_socket;
 	int			epfd;
-	epoll_event	ep_events[2];
+	epoll_event	ep_events[servers.size()];
+	int			client_socket;
 	int			triggered_events;
+	char		buf[2048] = {0};
 
 	epfd = epoll_create(1);
-	fds[0] = initSocket(epfd, 3000, ep_events[0]);
-	fds[1] = initSocket(epfd, 8000, ep_events[1]);
-	listen(fds[0], 5);
-	listen(fds[1], 5);
+	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
+		it->startListening(epfd, ep_events[it - servers.begin()]);
 	while (true)
 	{
-		triggered_events = epoll_wait(epfd, ep_events, 2, 0);
+		triggered_events = epoll_wait(epfd, ep_events, servers.size(), 0);
 		if (triggered_events > 0)
 		{
-			client_socket = -1;
-			for (int i = 0; i < triggered_events; i++)
-				client_socket = accept(ep_events[i].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
+			client_socket = accept(ep_events[0].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
 			if (client_socket != -1)
 			{
 				recv(client_socket, buf, sizeof(buf), 0);
 				try {
 					std::cout << std::endl << buf << std::endl;
-					Request rq(buf);
-					// Socket socket(client_socket);
-					// socket.addCgiHandler(".py", "/usr/bin/python3");
-					// methodHandler(rq, socket);
-
-					// handleCGI(rq, socket);
+					for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
+					{
+						if (it->getFd() == ep_events[it - servers.begin()].data.fd)
+						{
+							Request rq(buf, *it);
+							break;
+						}
+					}
 				}
 				catch (const std::exception &e) {
 					send(client_socket, e.what(), strlen(e.what()), 0);
@@ -97,4 +84,24 @@ int main(int argc, char **argv)
 			}
 		}
 	}
+}
+
+int main(int argc, char **argv)
+{
+	if (argc != 2)
+	{
+		std::cerr << "Usage: ./webserv <config_file>" << std::endl;
+		return 1;
+	}
+
+	std::vector<Socket> servers;
+	try {
+		servers = parseConfig(argv[1]);
+		startSockets(servers);
+	}
+	catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
+
 }
