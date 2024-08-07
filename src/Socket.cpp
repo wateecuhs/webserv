@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:05:29 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:21:11 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,58 @@ Socket::Socket(std::stringstream &iss, std::string word)
 	throw InvalidConfigFile();
 }
 
+
+int Socket::startListening()
+{
+	sockaddr_in			server_addr;
+	int					option = 1;
+
+	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(_port);
+	if (_host == "*")
+		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	else
+		inet_aton(_host.c_str(), &server_addr.sin_addr);
+
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
+	listen(this->_fd, 10);
+
+	_epoll_fd = epoll_create1(0);
+	_event.data.fd = this->_fd;
+	_event.events = EPOLLIN;
+	epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, this->_fd, &_event);
+	return (this->_fd);
+}
+
+// int Socket::startListening()
+// {
+// 	sockaddr_in			server_addr;
+// 	int					option = 1;
+
+// 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+// 	server_addr.sin_family = AF_INET;
+// 	server_addr.sin_port = htons(_port);
+// 	if (_host == "*")
+// 		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+// 	else
+// 		inet_aton(_host.c_str(), &server_addr.sin_addr);
+
+// 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+// 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
+// 	listen(this->_fd, 10);
+
+// 	_epoll_fd = epoll_create1(0);
+// 	_event.data.fd = this->_fd;
+// 	_event.events = EPOLLIN;
+// 	epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, this->_fd, &_event);
+// 	return (this->_fd);
+// }
+
+
 int Socket::startListening(int epfd, epoll_event &ep_event)
 {
 	sockaddr_in server_addr;
@@ -125,6 +177,23 @@ int Socket::startListening(int epfd, epoll_event &ep_event)
 	return (this->_fd);
 }
 
+void Socket::httpListen()
+{
+	int client_socket;
+	int triggered_events = epoll_wait(_epoll_fd, _events, 10, 0);
+
+	for (int i = 0; i < triggered_events; i++) {
+		if (_events[i].data.fd == this->_fd) {
+			client_socket = accept(this->_fd, (sockaddr *)NULL, (socklen_t *)NULL);
+			if (client_socket == -1)
+				throw std::runtime_error("Failed to accept client socket");
+			_event.data.fd = client_socket;
+			_event.events = EPOLLIN | EPOLLOUT;
+			epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
+		}
+	}
+}
+
 Socket::~Socket()
 {
 }
@@ -138,13 +207,13 @@ Socket &Socket::operator=(const Socket &copy)
 {
 	if (this != &copy)
 	{
-		this->_fd = copy._fd;
-		this->_host = copy._host;
-		this->_port = copy._port;
-		this->_server_names = copy._server_names;
-		this->_error_pages = copy._error_pages;
-		this->_body_size = copy._body_size;
-		this->_locations = copy._locations;
+		this->_fd = copy.getFd();
+		this->_host = copy.getHost();
+		this->_port = copy.getPort();
+		this->_server_names = copy.getServerNames();
+		this->_error_pages = copy.getErrorPages();
+		this->_body_size = copy.getBodySize();
+		this->_locations = copy.getLocations();
 	}
 	return *this;
 }

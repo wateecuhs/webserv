@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:05:41 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:30:26 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,47 @@
 void	methodHandler(Request &request, const Socket &socket);
 void	handleCGI(const Request &request, const Socket &socket);
 
-int	initSocket(int epfd, unsigned int port, epoll_event &ep_event)
-{
-	int	socketfd = socket(AF_INET, SOCK_STREAM, 0);
+// void startSockets(std::vector<Socket> servers)
+// {
+// 	int			epfd;
+// 	epoll_event	ep_events[servers.size()];
+// 	int			client_socket;
+// 	int			triggered_events;
+// 	char		buf[2048] = {0};
 
-	// Supposed to make the socket reusable instantly after the program closes but doesnt work
-	setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (void *)1, 1);
+// 	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
+// 		it->startListening();
+// 	while (true)
+// 	{
+// 		// triggered_events = epoll_wait(epfd, ep_events, servers.size(), 50);
+// 		// std::cout << "triggered_events: " << triggered_events << std::endl;
+// 		// if (triggered_events > 0)
+// 		// {
+// 		// 	client_socket = accept(ep_events[0].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
+// 		// 	if (client_socket != -1)
+// 		// 	{
+// 		// 		recv(client_socket, buf, sizeof(buf), 0);
+// 		// 		try {
+// 		// 			std::cout << std::endl << buf << std::endl;
+// 		// 			for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
+// 		// 			{
+// 		// 				if (it->getFd() == ep_events[it - servers.begin()].data.fd)
+// 		// 				{
+// 		// 					Request rq(buf, *it);
+// 		// 					break;
+// 		// 				}
+// 		// 			}
+// 		// 		}
+// 		// 		catch (const std::exception &e) {
+// 		// 			send(client_socket, e.what(), strlen(e.what()), 0);
+// 		// 			close(client_socket);
+// 		// 			std::cout << e.what() << std::endl;
+// 		// 		}
+// 		// 	}
+// 		// }
+// 	}
+// }
 
-	sockaddr_in server_addr;
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(port);
-	inet_aton("127.0.0.1", &server_addr.sin_addr);
-
-	bind(socketfd, (sockaddr *)&server_addr, sizeof(server_addr));
-
-	ep_event.data.fd = socketfd;
-	ep_event.events = EPOLLIN | EPOLLPRI;
-	epoll_ctl(epfd, EPOLL_CTL_ADD, socketfd, &ep_event);
-
-	return (socketfd);
-}
 
 void startSockets(std::vector<Socket> servers)
 {
@@ -72,6 +93,7 @@ void startSockets(std::vector<Socket> servers)
 						if (it->getFd() == ep_events[it - servers.begin()].data.fd)
 						{
 							Request rq(buf, *it);
+							std::cout << "loc path: " << rq.getLocation()->getPath() << std::endl;
 							break;
 						}
 					}
@@ -85,6 +107,7 @@ void startSockets(std::vector<Socket> servers)
 		}
 	}
 }
+
 
 int main(int argc, char **argv)
 {

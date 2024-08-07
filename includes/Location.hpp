@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:27:08 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:10:19 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class Location
 		bool								getUseCGI() const;
 		void								setMethod(std::string method);
 		bool								*getMethods();
+		bool								getMethod(int method) const;
 		void								setAutoindex(bool autoindex);
 		bool								getAutoindex() const;
 		void								setDefaultFile(std::string default_file);
