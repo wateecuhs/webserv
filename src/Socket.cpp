@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:17:28 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:11:32 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,13 +141,13 @@ Socket &Socket::operator=(const Socket &copy)
 {
 	if (this != &copy)
 	{
-		this->_fd = copy._fd;
-		this->_host = copy._host;
-		this->_port = copy._port;
-		this->_server_names = copy._server_names;
-		this->_error_pages = copy._error_pages;
-		this->_body_size = copy._body_size;
-		this->_locations = copy._locations;
+		this->_fd = copy.getFd();
+		this->_host = copy.getHost();
+		this->_port = copy.getPort();
+		this->_server_names = copy.getServerNames();
+		this->_error_pages = copy.getErrorPages();
+		this->_body_size = copy.getBodySize();
+		this->_locations = copy.getLocations();
 	}
 	return *this;
 }
