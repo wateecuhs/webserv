@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:27:12 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/06 15:45:26 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ Location::Location(std::stringstream &iss, std::string word)
 	for (int i = 0; i < 3; i++)
 		this->_methods[i] = false;
 	this->_path = word;
-	std::cout << "Location path: " << this->_path << std::endl;
-
 	while (iss >> word)
 	{
 		trailing_semicolon = word[word.size() - 1] == ';' && word.size() > 1;
@@ -155,12 +153,14 @@ Location &Location::operator=(const Location &copy)
 {
 	if (this == &copy)
 		return *this;
-	this->_path = copy._path;
-	this->_root = copy._root;
-	this->_useCGI = copy._useCGI;
-	this->_CGI_map = copy._CGI_map;
-	this->_autoindex = copy._autoindex;
-	this->_default_file = copy._default_file;
+	std::cout << "Location operator=" << std::endl;
+	std::cout << "Location addy: " << &copy._path << std::endl;
+	this->_path = copy.getPath();
+	this->_root = copy.getRoot();
+	this->_useCGI = copy.getUseCGI();
+	this->_CGI_map = copy.getCGIMap();
+	this->_autoindex = copy.getAutoindex();
+	this->_default_file = copy.getDefaultFile();
 	this->_methods[0] = copy._methods[0];
 	this->_methods[1] = copy._methods[1];
 	this->_methods[2] = copy._methods[2];

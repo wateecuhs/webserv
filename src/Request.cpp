@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:32:54 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/06 16:39:59 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	size_t	headers_end;
 	size_t	longest_length = 0;
 	std::vector<Location> locations;
-	
+
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -45,8 +45,9 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 		if (this->_path.rfind(locations[i].getPath(), 0) == 0 && locations[i].getPath().length() > longest_length)
 		{
 			longest_length = locations[i].getPath().length();
-			this->_location = &locations[i];
-			std::cout << "Location path: " << this->_location->getPath() << std::endl;
+			this->_location = new Location(locations[i]);
+			std::cout << "Location path1: " << locations[i].getPath() << std::endl;
+			std::cout << "Location path2: " << this->_location->getPath() << std::endl;
 		}
 	}
 	setBody(request.substr(headers_end + 4));
@@ -69,7 +70,7 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
-	this->_location = src.getLocation();
+	*this->_location = *src.getLocation();
 	return *this;
 }
 
