@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:11:32 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:13:38 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,6 @@ Socket::Socket(std::stringstream &iss, std::string word)
 				{
 					Location location(iss, word);
 					this->_locations.push_back(location);
-					std::cout << "Location added " << location.getPath() << std::endl;
-					std::cout << "With address " << &location << std::endl;
 					state = conf_new_token;
 				}
 				break;
@@ -111,7 +109,6 @@ int Socket::startListening(int epfd, epoll_event &ep_event)
 	sockaddr_in server_addr;
 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-	std::cout << "Listening to " << this->_host << ":" << this->_port << std::endl;
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(_port);
 	if (_host == "*")

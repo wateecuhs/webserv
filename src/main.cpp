@@ -6,7 +6,7 @@
 /*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 13:00:34 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 13:05:41 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ int main(int argc, char **argv)
 	std::vector<Socket> servers;
 	try {
 		servers = parseConfig(argv[1]);
-		std::cout << servers.begin()->getLocations().begin()->getPath() << std::endl;
 		startSockets(servers);
 	}
 	catch (std::exception &e) {
