@@ -6,10 +6,9 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:40:23 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:47:49 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef LOCATION_HPP
 # define LOCATION_HPP
@@ -17,8 +16,6 @@
 #include <string>
 #include "Socket.hpp"
 #include <map>
-
-class Socket;
 
 class Socket;
 
@@ -35,10 +32,10 @@ class Location
 		bool								_file_upload;
 		std::string							_upload_path;
 		std::string							_http_redirection;
-		Socket								&_socket;
+
 		Location();
 	public:
-		Location(std::stringstream &iss, std::string word, Socket &socket);
+		Location(std::stringstream &iss, std::string word);
 		Location(const Location &copy);
 		Location &operator=(const Location &copy);
 		~Location();

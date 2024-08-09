@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/07 16:40:45 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:48:56 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 # define REQUEST_HPP
 
 #include "enums.hpp"
-#include "Location.hpp"
-#include "Socket.hpp"
 #include "Location.hpp"
 #include "Socket.hpp"
 #include <map>

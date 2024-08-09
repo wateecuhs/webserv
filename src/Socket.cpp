@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:45:53 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:49:35 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ Socket::Socket(std::stringstream &iss, std::string word)
 
 			case conf_location:
 				{
-					Location location(iss, word, *this);
+					Location location(iss, word);
 					this->_locations.push_back(location);
 					state = conf_new_token;
 				}

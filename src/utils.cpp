@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:42:30 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 23:00:40 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:46:31 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ std::string	strSizeToStr(std::string str)
 {
 	std::stringstream ss;
 	ss << str.size();
+	if (ss.fail())
+		throw InternalServerError500();
 	return ss.str();
 }
 

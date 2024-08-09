@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:43:20 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:50:14 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "parsing.hpp"
 #include "exceptions.hpp"
 
-Location::Location(std::stringstream &iss, std::string word, Socket &socket): _socket(socket)
+Location::Location(std::stringstream &iss, std::string word)
 {
 	LocationState	state = loc_brace_open;
 	std::string		shaved_word;
@@ -135,7 +135,7 @@ Location::~Location()
 {
 }
 
-Location::Location(const Location &copy): _socket(copy._socket)
+Location::Location(const Location &copy)
 {
 	this->_path = copy.getPath();
 	this->_root = copy.getRoot();
