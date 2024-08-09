@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/22 17:25:49 by panger            #+#    #+#             */
-/*   Updated: 2024/08/06 12:32:58 by waticouz         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2024/08/09 15:48:56 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
@@ -33,9 +34,10 @@ class Request {
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		std::string							_query;
-		
+
 		Location							*_location;
 		Socket								&_socket;
+
 		Request();
 	public:
 		Request(std::string request, Socket &socket);
@@ -59,7 +61,9 @@ class Request {
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
 		void								setLocation(Location *location);
-		Location							*getLocation();
+		Location							*getLocation() const;
+		Socket								&getSocket() const;
+
 		bool								pathIsDirectory() const;
 };
 
