@@ -104,35 +104,37 @@ Socket::Socket(std::stringstream &iss, std::string word)
 	throw InvalidConfigFile();
 }
 
-int Socket::startListening()
-{
-	sockaddr_in			server_addr;
-	int					option = 1;
+// int Socket::startListening()
+// {
+// 	sockaddr_in			server_addr;
+// 	int					option = 1;
 
-	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+// 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(_port);
-	if (_host == "*")
-		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	else
-		inet_aton(_host.c_str(), &server_addr.sin_addr);
+// 	server_addr.sin_family = AF_INET;
+// 	server_addr.sin_port = htons(_port);
+// 	if (_host == "*")
+// 		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+// 	else
+// 		inet_aton(_host.c_str(), &server_addr.sin_addr);
 
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
-	listen(this->_fd, 10);
+// 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+// 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
+// 	listen(this->_fd, 10);
 
-	_epoll_fd = epoll_create1(0);
-	_event.data.fd = this->_fd;
-	_event.events = EPOLLIN;
-	epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, this->_fd, &_event);
-	return (this->_fd);
-}
+// 	_epoll_fd = epoll_create1(0);
+// 	_event.data.fd = this->_fd;
+// 	_event.events = EPOLLIN;
+// 	epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, this->_fd, &_event);
+// 	return (this->_fd);
+// }
 
 
 int Socket::startListening(int epfd, epoll_event &ep_event)
 {
-	sockaddr_in server_addr;
+	int			option = 1;
+	sockaddr_in	server_addr;
+
 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	server_addr.sin_family = AF_INET;
@@ -142,6 +144,7 @@ int Socket::startListening(int epfd, epoll_event &ep_event)
 	else
 		inet_aton(_host.c_str(), &server_addr.sin_addr);
 
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
 
 	ep_event.data.fd = this->_fd;

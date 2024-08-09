@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:41:02 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/07 15:16:32 by waticouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class Socket
 		int									_epoll_fd;
 		struct epoll_event					_event;
 		struct epoll_event					_events[10];
-
+		
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);

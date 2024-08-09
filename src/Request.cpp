@@ -58,13 +58,15 @@ Request::~Request()
 		delete this->_location;
 }
 
-Request::Request(Request &src): _socket(src._socket)
+Request::Request(Request &src): _socket(src.getSocket())
 {
 	*this = src;
 }
 
 Request &Request::operator=(Request &src)
 {
+	this->_socket = src.getSocket();
+	this->_confd = src.getConfd();
 	this->_method = src.getMethod();
 	this->_path = src.getPath();
 	this->_pathIsDirectory = src.pathIsDirectory();
@@ -117,6 +119,22 @@ void Request::setPath(std::string path)
 		else
 			this->_pathIsDirectory = false;
 	}
+}
+
+Request::Request(const Request &src): _socket(src.getSocket())
+{
+	this->_confd = src.getConfd();
+	this->_method = src.getMethod();
+	this->_path = src.getPath();
+	this->_pathIsDirectory = src.pathIsDirectory();
+	this->_http_version = src.getHTTPVersion();
+	this->_headers = src.getHeaders();
+	this->_body = src.getBody();
+	this->_host = src.getHost();
+	this->_query = src.getQuery();
+	if (this->_location)
+		delete this->_location;
+	this->_location = new Location(*src.getLocation());
 }
 
 bool Request::pathIsDirectory() const
@@ -197,4 +215,14 @@ Location *Request::getLocation() const
 Socket &Request::getSocket() const
 {
 	return this->_socket;
+}
+
+int Request::getConfd() const
+{
+	return this->_socket.getFd();
+}
+
+void Request::setConfd(int confd)
+{
+	this->_socket.setFd(confd);
 }

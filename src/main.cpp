@@ -22,19 +22,19 @@
 #include <arpa/inet.h>
 #include <cstring>
 
-void	methodHandler(Request &request, const Socket &socket);
-void	handleCGI(const Request &request, const Socket &socket);
+void methodHandler(Request& request);
 
 void startSockets(std::vector<Socket> servers)
 {
-	int			epfd;
-	epoll_event	ep_events[servers.size() * 5] = {0};
-	int					client_socket;
-	int					triggered_events;
-	char				buf[2048] = {0};
-	std::vector<int>	client_sockets;
-	epoll_event			client_event;
-	int					event_fd;
+	int						epfd;
+	epoll_event				ep_events[servers.size() * 5];
+	int						client_socket;
+	int						triggered_events;
+	char					buf[2048] = {0};
+	std::vector<int>		client_sockets;
+	std::vector<Request>	requests;
+	epoll_event				client_event;
+	int						event_fd;
 
 	epfd = epoll_create(servers.size());
 	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
@@ -67,14 +67,14 @@ void startSockets(std::vector<Socket> servers)
 			for (std::vector<int>::iterator it = client_sockets.begin(); it != client_sockets.end(); it++) {
 				if (*it == event_fd) {
 					if (events & EPOLLIN) {
-						int bytes = recv(event_fd, buf, sizeof(buf), 0);
+						recv(event_fd, buf, sizeof(buf), 0);
 						try {
 							std::cout << std::endl << buf << std::endl;
 							for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
 							{
 								if (it->getFd() == ep_events[it - servers.begin()].data.fd)
 								{
-									Request rq(buf, *it);
+									requests.push_back(Request(buf, *it));
 									break;
 								}
 							}
@@ -86,10 +86,16 @@ void startSockets(std::vector<Socket> servers)
 						}
 					}
 					else if (events & EPOLLOUT) {
-						methodHandler(rq);
-						// send(event_fd, "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html><body><h1>Hello, World!</h1></body></html>", 90, 0);
-						close(event_fd);
-						client_sockets.erase(it);
+						std::cout << "Here" << std::endl;
+						for (std::vector<Request>::iterator it = requests.begin(); it != requests.end(); it++) {
+							std::cout << it->getConfd() << " " << event_fd << std::endl;
+							if (it->getConfd() == event_fd) {
+								std::cout << "Sending response" << std::endl;
+								methodHandler(*it);
+								requests.erase(it);
+								break;
+							}
+						}
 					}
 				}
 			}

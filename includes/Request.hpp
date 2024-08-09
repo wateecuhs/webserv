@@ -26,6 +26,7 @@ class Socket;
 
 class Request {
 	private:
+		int									_confd;
 		Methods								_method;
 		std::string							_path;
 		bool								_pathIsDirectory;
@@ -37,12 +38,13 @@ class Request {
 
 		Location							*_location;
 		Socket								&_socket;
-
 		Request();
+
 	public:
 		Request(std::string request, Socket &socket);
 		Request(Request &src);
 		Request &operator=(Request &src);
+		Request(const Request &src);
 		~Request();
 		Methods								getMethod() const;
 		std::string							getMethodString() const;
@@ -63,6 +65,8 @@ class Request {
 		void								setLocation(Location *location);
 		Location							*getLocation() const;
 		Socket								&getSocket() const;
+		int									getConfd() const;
+		void								setConfd(int confd);
 
 		bool								pathIsDirectory() const;
 };
