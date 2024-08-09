@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: panger <panger@student.42.fr>              +#+  +:+       +#+         #
+#    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/08/02 16:49:19 by panger           ###   ########.fr        #
+#    Updated: 2024/08/02 17:18:26 by alermolo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,8 @@ RAW_SOURCES	=	main.cpp								\
 				Location.cpp							\
 				utils.cpp								\
 				cgi_handler.cpp							\
-				exceptions.cpp
+				exceptions.cpp							\
+				utils.cpp
 
 
 OBJ_DIR		=	.build

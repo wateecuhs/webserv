@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:13:25 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:50:14 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Location.hpp"
 #include <sstream>
@@ -197,6 +198,14 @@ void Location::addCGIExtension(std::string extension, std::string path)
 std::map<std::string, std::string> Location::getCGIMap() const
 {
 	return this->_CGI_map;
+}
+
+std::string Location::getCGIPath(std::string extension) const
+{
+	std::map<std::string, std::string>::const_iterator it = this->_CGI_map.find(extension);
+	if (it == this->_CGI_map.end())
+		return "";
+	return it->second;
 }
 
 void Location::setMethod(std::string method)

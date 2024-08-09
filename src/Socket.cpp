@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:46:53 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:49:35 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ Socket::Socket(std::stringstream &iss, std::string word)
 					state = conf_body_size;
 				else if (word == "}")
 					return ;
-				else 
+				else
 					throw InvalidConfigFile();
 				break;
 
@@ -143,7 +143,7 @@ int Socket::startListening(int epfd, epoll_event &ep_event)
 		inet_aton(_host.c_str(), &server_addr.sin_addr);
 
 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
-	
+
 	ep_event.data.fd = this->_fd;
 	ep_event.events = EPOLLIN | EPOLLPRI;
 	epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &ep_event);

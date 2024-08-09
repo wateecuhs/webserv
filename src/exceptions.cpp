@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exceptions.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:37:57 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/02 17:12:01 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/05 17:11:58 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
-#include <iostream>
 
 const char *Forbidden403::what() const throw()
 {
@@ -25,6 +23,11 @@ const char *Forbidden403::what() const throw()
 const char *NotFound404::what() const throw()
 {
 	return "HTTP/1.1 404 Not Found\r\nContent-Length: 114\r\n\r\n<html>\n<head>\n\t<title>404 Not Found</title>\n</head>\n<body>\n\t<h1 align=\"center\">404 Not Found</h1>\n</body>\n</html>\n";
+}
+
+const char *MethodNotAllowed405::what() const throw()
+{
+	return "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\n\r\n";
 }
 
 const char *InternalServerError500::what() const throw()

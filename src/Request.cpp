@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:34:04 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 16:15:08 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	size_t					longest_length = 0;
 	std::vector<Location>	locations;
 	std::string				tmp_path;
-	
+
+	this->_location = NULL;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -188,7 +189,12 @@ void Request::setLocation(Location *location)
 	this->_location = location;
 }
 
-Location *Request::getLocation()
+Location *Request::getLocation() const
 {
 	return this->_location;
+}
+
+Socket &Request::getSocket() const
+{
+	return this->_socket;
 }
