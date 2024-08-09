@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:37:57 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/05 17:11:58 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 16:24:49 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,11 @@ const char *NotFound404::what() const throw()
 const char *MethodNotAllowed405::what() const throw()
 {
 	return "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\n\r\n";
+}
+
+const char *RequestTimeout408::what() const throw()
+{
+	return "HTTP/1.1 408 Request Timeout\r\nContent-Length: 0\r\n\r\n";
 }
 
 const char *InternalServerError500::what() const throw()

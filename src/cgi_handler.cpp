@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/09 15:29:21 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 16:24:16 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,16 @@
 #include <sys/socket.h>
 #include <cstdlib>
 #include <sstream>
+#include <signal.h>
+
+static pid_t		cgi_pid;
+
+void	handle_timeout(int sig){
+	if (sig == SIGALRM){
+		kill(cgi_pid, SIGKILL);
+		throw RequestTimeout408();
+	}
+}
 
 static std::string	execCGI(Request &request)
 {
@@ -39,19 +49,19 @@ static std::string	execCGI(Request &request)
 	std::string	path = location->getRoot() + request.getPath();
 	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
 
-	pid_t 	pid;
+	// pid_t 	pid;
 	int 	pipe_out[2];
 	int 	pipe_in[2];
 	int 	status = 0;
 
 	if (pipe(pipe_out) == -1 || pipe(pipe_in) == -1)
 		throw InternalServerError500();
-	pid = fork();
-	if (pid == -1)
+	cgi_pid = fork();
+	if (cgi_pid == -1)
 		throw InternalServerError500();
 
 	//child process
-	if (pid == 0)
+	if (cgi_pid == 0)
 	{
 		close(pipe_out[0]);
 		close(pipe_in[1]);
@@ -74,6 +84,9 @@ static std::string	execCGI(Request &request)
 		close(pipe_out[1]);
 		close(pipe_in[0]);
 
+		signal(SIGALRM, handle_timeout);
+		alarm(3);
+
 		//put request body into pipe for cgi handler to read
 		write(pipe_in[1], request.getBody().c_str(), request.getBody().size());
 		close(pipe_in[1]);
@@ -90,7 +103,8 @@ static std::string	execCGI(Request &request)
 		}
 		close(pipe_out[0]);
 
-		waitpid(pid, &status, 0);
+		waitpid(cgi_pid, &status, 0);
+		alarm(0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
 
