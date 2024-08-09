@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:08 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:52:59 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include "exceptions.hpp"
-
+#include "utils.hpp"
 
 Request::Request(std::string request, Socket &socket): _socket(socket)
 {
@@ -73,6 +73,8 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
+	this->_hasCookies = src.hasCookies();
+	this->_cookies = src._cookies;
 	if (this->_location)
 		delete this->_location;
 	this->_location = new Location(*src.getLocation());
@@ -197,4 +199,47 @@ Location *Request::getLocation() const
 Socket &Request::getSocket() const
 {
 	return this->_socket;
+}
+
+bool Request::hasCookies() const
+{
+	return this->_hasCookies;
+}
+
+void Request::setHasCookies(bool hasCookies)
+{
+	this->_hasCookies = hasCookies;
+}
+
+std::string Request::getCookie(std::string key) const
+{
+	if (this->_cookies.find(key) == this->_cookies.end())
+		return "";
+	return this->_cookies.at(key);
+}
+
+void Request::setCookie(std::string key, std::string value)
+{
+	this->_cookies[key] = value;
+	this->_hasCookies = true;
+}
+
+std::string Request::getResponse() const
+{
+	return this->_response;
+}
+
+void Request::setResponse(std::string status, std::string content)
+{
+	std::string response = "HTTP/1.1 " + status;
+
+	if (this->hasCookies())
+	{
+		response += "\r\nSet-Cookie: ";
+		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
+			response += it->first + "=" + it->second + "; ";
+		response.pop_back();
+	}
+	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	this->_response = response;
 }

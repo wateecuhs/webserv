@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/09 15:48:56 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:48:04 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ class Request {
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		std::string							_query;
+		std::map<std::string, std::string>	_cookies;
+		bool								_hasCookies;
+		std::string							_response;
 
 		Location							*_location;
 		Socket								&_socket;
@@ -65,6 +68,12 @@ class Request {
 		Socket								&getSocket() const;
 
 		bool								pathIsDirectory() const;
+		bool								hasCookies() const;
+		void								setHasCookies(bool hasCookies);
+		std::string							getCookie(std::string key) const;
+		void								setCookie(std::string key, std::string value);
+		std::string							getResponse() const;
+		void								setResponse(std::string status, std::string content);
 };
 
 #endif

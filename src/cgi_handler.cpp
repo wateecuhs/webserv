@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/09 16:24:16 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:57:38 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,8 @@ static std::string	execCGI(Request &request)
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
 
-		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
+		// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
+		std::string response = ss.str();
 		return response;
 	}
 }
@@ -128,7 +129,9 @@ void	handleCGI(Request &request){
 	close(backup_stdin);
 	close(backup_stdout);
 
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-	if (send(request.getSocket().getFd(), response.c_str(), response.size(), 0) == -1)
+	// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	request.setResponse("200 OK", content);
+	// if (send(request.getSocket().getFd(), response.c_str(), response.size(), 0) == -1)
+	if (send(request.getSocket().getFd(), request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
