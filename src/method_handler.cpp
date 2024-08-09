@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 15:37:42 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/06 23:38:04 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:29:00 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void handleGetRequest(Request &request) {
 	}
 
 	std::string path;
-	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 
 	if (pathIsDirectory(path)){
 		std::string indexPath = path;
@@ -110,14 +110,14 @@ static void handleGetRequest(Request &request) {
 static void	handleUpload(Request &request) {
 	Location 	*location = request.getLocation();
 	Socket 		socket = request.getSocket();
-	std::string path = location->getPath() + location->getRoot() + request.getPath();
+	std::string path = location->getRoot() + request.getPath();
 
 	if (pathIsDirectory(path))
 		throw BadRequest();
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
     if (!file)
-        throw InternalServerError500();
+		throw InternalServerError500();
 
 	if (access(path.c_str(), W_OK) == -1){
 		file.close();
@@ -140,7 +140,7 @@ static void handlePostRequest(Request &request) {
 		return handleUpload(request);
 
 	std::string	path;
-	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 
 	if (pathIsDirectory(path))
 		path += "/uploadedData.txt";
@@ -189,7 +189,7 @@ static void	handleDeleteRequest(Request &request) {
 	Location 	*location = request.getLocation();
 
 	std::string	path;
-	location ? path = location->getPath() + location->getRoot() + request.getPath() : path = request.getPath();
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 
 	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
@@ -199,21 +199,22 @@ static void	handleDeleteRequest(Request &request) {
 }
 
 void methodHandler(Request& request) {
-	bool	*allowed_methods = request.getLocation()->getMethods();
+	Location	*location = request.getLocation();
+	// bool		*allowed_methods;
 
 	switch (request.getMethod()) {
 		case GET:
-			if (!allowed_methods[GET])
+			if (location && !location->getMethod(GET))
 				throw MethodNotAllowed405();
 			handleGetRequest(request);
 			break;
 		case POST:
-			if (!allowed_methods[POST])
+			if (location && !location->getMethod(POST))
 				throw MethodNotAllowed405();
 			handlePostRequest(request);
 			break;
 		case DELETE:
-			if (!allowed_methods[DELETE])
+			if (location && !location->getMethod(DELETE))
 				throw MethodNotAllowed405();
 			handleDeleteRequest(request);
 			break;

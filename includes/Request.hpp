@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/07 13:13:08 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/07 16:40:45 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,6 @@
 class Location;
 class Socket;
 
-class Location;
-class Socket;
-
 class Request {
 	private:
 		Methods								_method;
@@ -42,8 +39,7 @@ class Request {
 
 		Location							*_location;
 		Socket								&_socket;
-		Location							*_location;
-		Socket								&_socket;
+
 		Request();
 	public:
 		Request(std::string request, Socket &socket);

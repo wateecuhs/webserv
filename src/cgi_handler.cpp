@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 14:13:19 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/06 23:39:06 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 15:29:21 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static std::string	execCGI(Request &request)
 	std::string cgi_handler = location->getCGIPath(extension);
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
-	std::string	path = location->getPath() + location->getRoot() + request.getPath();
+	std::string	path = location->getRoot() + request.getPath();
 	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
 
 	pid_t 	pid;

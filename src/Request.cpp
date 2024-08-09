@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:45:45 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/07 16:15:08 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,13 @@
 
 Request::Request(std::string request, Socket &socket): _socket(socket)
 {
-	size_t	headers_start;
-	size_t	headers_end;
-	size_t	longest_length = 0;
-
 	size_t					headers_start;
 	size_t					headers_end;
 	size_t					longest_length = 0;
 	std::vector<Location>	locations;
 	std::string				tmp_path;
 
+	this->_location = NULL;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -185,4 +182,19 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
+}
+
+void Request::setLocation(Location *location)
+{
+	this->_location = location;
+}
+
+Location *Request::getLocation() const
+{
+	return this->_location;
+}
+
+Socket &Request::getSocket() const
+{
+	return this->_socket;
 }

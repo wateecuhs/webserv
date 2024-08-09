@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:30:26 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 #include <arpa/inet.h>
 #include <cstring>
 
-void	methodHandler(Request &request, const Socket &socket);
-void	handleCGI(const Request &request, const Socket &socket);
+void	methodHandler(Request &request);
+// void	handleCGI(const Request &request, const Socket &socket);
 
 // void startSockets(std::vector<Socket> servers)
 // {
@@ -93,7 +93,8 @@ void startSockets(std::vector<Socket> servers)
 						if (it->getFd() == ep_events[it - servers.begin()].data.fd)
 						{
 							Request rq(buf, *it);
-							std::cout << "loc path: " << rq.getLocation()->getPath() << std::endl;
+							methodHandler(rq);
+							// std::cout << "loc path: " << rq.getLocation()->getPath() << std::endl;
 							break;
 						}
 					}
