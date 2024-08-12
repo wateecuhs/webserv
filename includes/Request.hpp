@@ -41,7 +41,7 @@ class Request {
 		Request();
 
 	public:
-		Request(std::string request, Socket &socket);
+		Request(std::string request, Socket &socket, int confd);
 		Request(Request &src);
 		Request &operator=(Request &src);
 		Request(const Request &src);

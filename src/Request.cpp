@@ -18,7 +18,7 @@
 #include "exceptions.hpp"
 
 
-Request::Request(std::string request, Socket &socket): _socket(socket)
+Request::Request(std::string request, Socket &socket, int confd): _confd(confd),  _socket(socket), _location(NULL)
 {
 	size_t					headers_start;
 	size_t					headers_end;
@@ -26,7 +26,6 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	std::vector<Location>	locations;
 	std::string				tmp_path;
 
-	this->_location = NULL;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -219,10 +218,10 @@ Socket &Request::getSocket() const
 
 int Request::getConfd() const
 {
-	return this->_socket.getFd();
+	return this->_confd;
 }
 
 void Request::setConfd(int confd)
 {
-	this->_socket.setFd(confd);
+	this->_confd = confd;
 }
