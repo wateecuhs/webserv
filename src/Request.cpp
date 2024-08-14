@@ -17,15 +17,14 @@
 #include <sys/stat.h>
 #include "exceptions.hpp"
 
+Request::Request() {}
 
-Request::Request(std::string request, Socket &socket, int confd): _confd(confd),  _socket(socket), _location(NULL)
+Request::Request(std::string request)
 {
 	size_t					headers_start;
 	size_t					headers_end;
-	size_t					longest_length = 0;
-	std::vector<Location>	locations;
-	std::string				tmp_path;
 
+	std::cout << "Request: " << request << std::endl;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -38,34 +37,60 @@ Request::Request(std::string request, Socket &socket, int confd): _confd(confd),
 	parseHeaders(request.substr(headers_start, headers_end), *this);
 	setHost(this->_headers["Host"]);
 
-	locations = this->_socket.getLocations();
-	for (size_t i = 0; i < locations.size(); i++)
-	{
-		tmp_path = locations[i].getPath();
-		if (this->_path.rfind(tmp_path, 0) == 0 && tmp_path.length() > longest_length)
-		{
-			longest_length = tmp_path.length();
-			this->_location = new Location(locations[i]);
-		}
-	}
 	setBody(request.substr(headers_end + 4));
+	std::cout << "Request Parsed" << std::endl;
 }
+
+// Request::Request(std::string request, Socket &socket, int confd)//: _confd(confd)//, _location(NULL),  _socket(socket)
+// {
+// 	size_t					headers_start;
+// 	size_t					headers_end;
+// 	// size_t					longest_length = 0;
+// 	// std::vector<Location>	locations;
+// 	// std::string				tmp_path;
+
+// 	(void)confd;
+// 	(void)socket;
+// 	headers_start = request.find("\r\n");
+// 	headers_end = request.find("\r\n\r\n");
+// 	if (headers_start == std::string::npos)
+// 		throw BadRequest();
+// 	headers_start += 2;
+// 	if (headers_start == std::string::npos || headers_end == std::string::npos)
+// 		throw BadRequest();
+
+// 	parseRequestLine(request.substr(0, headers_start), *this);
+// 	parseHeaders(request.substr(headers_start, headers_end), *this);
+// 	setHost(this->_headers["Host"]);
+
+	// locations = this->_socket.getLocations();
+	// for (size_t i = 0; i < locations.size(); i++)
+	// {
+	// 	tmp_path = locations[i].getPath();
+	// 	if (this->_path.rfind(tmp_path, 0) == 0 && tmp_path.length() > longest_length)
+	// 	{
+	// 		longest_length = tmp_path.length();
+	// 		this->_location = new Location(locations[i]);
+	// 	}
+	// }
+// 	setBody(request.substr(headers_end + 4));
+// }
 
 Request::~Request()
 {
-	if (this->_location)
-		delete this->_location;
+	// if (this->_location)
+		// delete this->_location;
 }
 
-Request::Request(Request &src): _socket(src.getSocket())
+Request::Request(Request &src)//: _socket(src.getSocket())
 {
 	*this = src;
 }
 
 Request &Request::operator=(Request &src)
 {
-	this->_socket = src.getSocket();
-	this->_confd = src.getConfd();
+	// this->_socket = src.getSocket();
+	// this->_confd = src.getConfd();
 	this->_method = src.getMethod();
 	this->_path = src.getPath();
 	this->_pathIsDirectory = src.pathIsDirectory();
@@ -74,9 +99,27 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
-	if (this->_location)
-		delete this->_location;
-	this->_location = new Location(*src.getLocation());
+	// if (this->_location)
+	// 	delete this->_location;
+	// this->_location = new Location(*src.getLocation());
+	return *this;
+}
+
+Request &Request::operator=(const Request &src)
+{
+	// this->_socket = src.getSocket();
+	// this->_confd = src.getConfd();
+	this->_method = src.getMethod();
+	this->_path = src.getPath();
+	this->_pathIsDirectory = src.pathIsDirectory();
+	this->_http_version = src.getHTTPVersion();
+	this->_headers = src.getHeaders();
+	this->_body = src.getBody();
+	this->_host = src.getHost();
+	this->_query = src.getQuery();
+	// if (this->_location)
+	// 	delete this->_location;
+	// this->_location = new Location(*src.getLocation());
 	return *this;
 }
 
@@ -120,9 +163,9 @@ void Request::setPath(std::string path)
 	}
 }
 
-Request::Request(const Request &src): _socket(src.getSocket())
+Request::Request(const Request &src)//: _socket(src.getSocket())
 {
-	this->_confd = src.getConfd();
+	// this->_confd = src.getConfd();
 	this->_method = src.getMethod();
 	this->_path = src.getPath();
 	this->_pathIsDirectory = src.pathIsDirectory();
@@ -131,9 +174,9 @@ Request::Request(const Request &src): _socket(src.getSocket())
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
-	if (this->_location)
-		delete this->_location;
-	this->_location = new Location(*src.getLocation());
+	// if (this->_location)
+	// 	delete this->_location;
+	// this->_location = new Location(*src.getLocation());
 }
 
 bool Request::pathIsDirectory() const
@@ -201,27 +244,27 @@ std::string Request::getQuery() const
 	return this->_query;
 }
 
-void Request::setLocation(Location *location)
-{
-	this->_location = location;
-}
+// void Request::setLocation(Location *location)
+// {
+// 	this->_location = location;
+// }
 
-Location *Request::getLocation() const
-{
-	return this->_location;
-}
+// Location *Request::getLocation() const
+// {
+// 	return this->_location;
+// }
 
-Socket &Request::getSocket() const
-{
-	return this->_socket;
-}
+// Socket &Request::getSocket() const
+// {
+// 	return this->_socket;
+// }
 
-int Request::getConfd() const
-{
-	return this->_confd;
-}
+// int Request::getConfd() const
+// {
+// 	return this->_confd;
+// }
 
-void Request::setConfd(int confd)
-{
-	this->_confd = confd;
-}
+// void Request::setConfd(int confd)
+// {
+// 	this->_confd = confd;
+// }

@@ -85,7 +85,6 @@ std::vector<Socket> parseServers(std::string content)
 				else if (word == "server{"){
 					Socket tmp(iss, word);
 					sockets.push_back(tmp);
-					// printSocket(tmp);
 				}
 				else
 					throw InvalidConfigFile();
@@ -95,7 +94,6 @@ std::vector<Socket> parseServers(std::string content)
 				if (word == "{") {
 					Socket tmp(iss, word);
 					sockets.push_back(tmp);
-					// printSocket(tmp);
 					state = conf_server;
 				}
 				else

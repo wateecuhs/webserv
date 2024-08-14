@@ -18,6 +18,7 @@
 #include <vector>
 #include "Location.hpp"
 #include <sys/epoll.h>
+#include "Client.hpp"
 
 class Location;
 
@@ -34,6 +35,7 @@ class Socket
 		int									_epoll_fd;
 		struct epoll_event					_event;
 		struct epoll_event					_events[10];
+		std::map<int, Client>				_clients;
 		
 		Socket();
 	public:
@@ -56,9 +58,11 @@ class Socket
 		int									getBodySize() const;
 		void								addLocation(Location location);
 		std::vector<Location>				getLocations() const;
-		int 								startListening();
-		int									startListening(int epfd, epoll_event &ep_event);
+		int									startListening(int epfd);
 		void								httpListen();
+		int									acceptConnection(int event_fd);
+		std::map<int, Client>				&getClients();
+		void								sendResponse(Request request, int client_fd);
 };
 
 #endif

@@ -104,36 +104,12 @@ Socket::Socket(std::stringstream &iss, std::string word)
 	throw InvalidConfigFile();
 }
 
-// int Socket::startListening()
-// {
-// 	sockaddr_in			server_addr;
-// 	int					option = 1;
 
-// 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-// 	server_addr.sin_family = AF_INET;
-// 	server_addr.sin_port = htons(_port);
-// 	if (_host == "*")
-// 		server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-// 	else
-// 		inet_aton(_host.c_str(), &server_addr.sin_addr);
-
-// 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-// 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
-// 	listen(this->_fd, 10);
-
-// 	_epoll_fd = epoll_create1(0);
-// 	_event.data.fd = this->_fd;
-// 	_event.events = EPOLLIN;
-// 	epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, this->_fd, &_event);
-// 	return (this->_fd);
-// }
-
-
-int Socket::startListening(int epfd, epoll_event &ep_event)
+int Socket::startListening(int epfd)
 {
 	int			option = 1;
 	sockaddr_in	server_addr;
+	epoll_event event;
 
 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -147,9 +123,9 @@ int Socket::startListening(int epfd, epoll_event &ep_event)
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
 
-	ep_event.data.fd = this->_fd;
-	ep_event.events = EPOLLIN | EPOLLPRI;
-	epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &ep_event);
+	event.data.fd = this->_fd;
+	event.events = EPOLLIN | EPOLLPRI;
+	epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &event);
 	listen(this->_fd, 5);
 	return (this->_fd);
 }
@@ -263,4 +239,26 @@ void Socket::setFd(int fd)
 int Socket::getFd() const
 {
 	return this->_fd;
+}
+
+int Socket::acceptConnection(int event_fd)
+{
+	int client_socket = accept(event_fd, (sockaddr *)NULL, (socklen_t *)NULL);
+	if (client_socket == -1)
+		throw std::runtime_error("Failed to accept client socket");
+	_event.data.fd = client_socket;
+	_event.events = EPOLLIN | EPOLLOUT;
+	_clients[client_socket] = Client(client_socket);
+	return client_socket;
+}
+
+std::map<int, Client> &Socket::getClients()
+{
+	return _clients;
+}
+
+void Socket::sendResponse(Request request, int client_fd)
+{
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world!";
+	send(client_fd, response.c_str(), response.size(), 0);
 }
