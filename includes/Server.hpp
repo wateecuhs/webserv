@@ -23,7 +23,7 @@ class Server
 		std::vector<Socket>			_sockets;
 		int							_epoll_fd;
 		std::vector<epoll_event>	_epoll_events;
-		std::vector<Socket>			parseServers(std::string content);
+		std::vector<Socket>			_parseServers(std::string content);
 		Server();
 
 	public:

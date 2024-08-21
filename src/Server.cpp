@@ -25,7 +25,7 @@ Server::Server(std::string config): _epoll_events(10)
 		throw InvalidConfigFile();
 	std::string content((std::istreambuf_iterator<char>(cfstream)),
 						 std::istreambuf_iterator<char>());
-	this->_sockets = parseServers(content);
+	this->_sockets = _parseServers(content);
 	this->_epoll_fd = epoll_create(1);
 }
 
@@ -101,7 +101,6 @@ void Server::startServer()
 						{
 							if (events & EPOLLIN)
 							{
-								std::cout << "reading request " << event_fd << std::endl;
 								try {
 									it_client->second.readRequest();
 								}
@@ -113,7 +112,6 @@ void Server::startServer()
 							}
 							if (events & EPOLLOUT && it_client->second.isReady())
 							{
-								std::cout << "sending response" << std::endl;
 								it->sendResponse(it_client->second.getRequest(), it_client->first);
 							}
 						}
@@ -124,7 +122,7 @@ void Server::startServer()
 	}
 }
 
-std::vector<Socket> Server::parseServers(std::string content)
+std::vector<Socket> Server::_parseServers(std::string content)
 {
 	std::vector<Socket>	sockets;
 	std::stringstream	iss(content);

@@ -251,8 +251,6 @@ int Socket::acceptConnection(int event_fd)
 	int client_socket = accept(event_fd, (sockaddr *)NULL, (socklen_t *)NULL);
 	if (client_socket == -1)
 		throw std::runtime_error("Failed to accept client socket");
-	_event.data.fd = client_socket;
-	_event.events = EPOLLIN | EPOLLOUT;
 	_clients[client_socket] = Client(client_socket);
 	return client_socket;
 }

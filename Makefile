@@ -26,7 +26,6 @@ HEADERS		=	parsing.hpp								\
 RAW_SOURCES	=	main.cpp								\
 				Request.cpp								\
 				Socket.cpp								\
-				parsing/conf_parsing.cpp				\
 				parsing/conf_utils.cpp					\
 				parsing/req_parsing_reqline.cpp			\
 				parsing/req_parsing_headers.cpp			\
