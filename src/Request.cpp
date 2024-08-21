@@ -24,7 +24,7 @@ Request::Request(std::string request)
 	size_t					headers_start;
 	size_t					headers_end;
 
-	std::cout << "Request: " << request << std::endl;
+	// std::cout << "Request: " << std::endl << "'" << request << "'" <<std::endl;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -38,7 +38,6 @@ Request::Request(std::string request)
 	setHost(this->_headers["Host"]);
 
 	setBody(request.substr(headers_end + 4));
-	std::cout << "Request Parsed" << std::endl;
 }
 
 // Request::Request(std::string request, Socket &socket, int confd)//: _confd(confd)//, _location(NULL),  _socket(socket)

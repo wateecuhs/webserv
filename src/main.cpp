@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 11:02:54 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 #include "Server.hpp"
 
 void methodHandler(Request& request);
-
+/* 
 // void handleNewClients()
 // {
 // 	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++) {
@@ -127,8 +127,7 @@ void methodHandler(Request& request);
 // 		}
 // 	}
 // }
-
-
+*/
 
 int main(int argc, char **argv)
 {
@@ -138,7 +137,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::vector<Socket> servers;
+	// std::vector<Socket> servers;
 	try {
 		Server server(argv[1]);
 		server.startServer();

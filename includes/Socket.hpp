@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:16:32 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/21 11:50:29 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,13 @@ class Socket
 		struct epoll_event					_event;
 		struct epoll_event					_events[10];
 		std::map<int, Client>				_clients;
-		
+		void								_methodHandler(Request& request, int client_fd);
+		void								_handleDeleteRequest(Request &request, Location *location, int client_fd);
+		void								_handleGetRequest(Request &request, Location *location, int client_fd);
+		void								_handlePostRequest(Request &request, Location *location, int client_fd);
+		void								_handleUpload(Request &request, Location *location, int client_fd);
+		std::string							_execCGI(Request &request, Location *location);
+		void								_handleCGI(Request &request, Location *location, int client_fd);
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);

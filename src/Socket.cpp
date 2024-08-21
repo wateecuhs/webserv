@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/09 15:49:35 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 12:00:20 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,11 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <sys/socket.h>
+#include <dirent.h>
+#include <sys/wait.h>
+#include <cstdlib>
+
+static std::string	listDirectory(const std::string &path);
 
 Socket::Socket(std::stringstream &iss, std::string word)
 {
@@ -259,6 +264,326 @@ std::map<int, Client> &Socket::getClients()
 
 void Socket::sendResponse(Request request, int client_fd)
 {
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world!";
-	send(client_fd, response.c_str(), response.size(), 0);
+	try {
+		this->_methodHandler(request, client_fd);
+	}
+	catch (const std::exception &e) {
+		std::cout << "Exception: " << e.what() << std::endl;
+		send(client_fd, e.what(), strlen(e.what()), 0);
+		close(client_fd);
+	}
+}
+
+void Socket::_methodHandler(Request& request, int client_fd)
+{
+	std::vector<Location>	locations = this->_locations;
+	std::string				tmp_path;
+	size_t					longest_length = 0;
+	int						loc_idx = -1;
+
+	for (size_t i = 0; i < locations.size(); i++)
+	{
+		tmp_path = locations[i].getPath();
+		if (request.getPath().rfind(tmp_path, 0) == 0 && (tmp_path.length() > longest_length || longest_length == 0))
+		{
+			longest_length = tmp_path.length();
+			loc_idx = i;
+		}
+	}
+	switch (request.getMethod()) {
+		case GET:
+			if (loc_idx != -1 && !locations[loc_idx].getMethod(GET))
+				throw MethodNotAllowed405();
+			if (loc_idx == -1)
+				this->_handleGetRequest(request, (Location *)NULL, client_fd);
+			else
+				this->_handleGetRequest(request, &locations[loc_idx], client_fd);
+			break;
+		case POST:
+			if (loc_idx != -1 && !locations[loc_idx].getMethod(POST))
+				throw MethodNotAllowed405();
+			if (loc_idx == -1)
+				this->_handlePostRequest(request, (Location *)NULL, client_fd);
+			else
+				this->_handlePostRequest(request, &locations[loc_idx], client_fd);
+			break;
+		case DELETE:
+			if (loc_idx != -1 && !locations[loc_idx].getMethod(DELETE))
+				throw MethodNotAllowed405();
+			if (loc_idx == -1)
+				this->_handleDeleteRequest(request, (Location *)NULL, client_fd);
+			else
+				this->_handleDeleteRequest(request, &locations[loc_idx], client_fd);
+			break;
+		default:
+			throw MethodNotAllowed405();
+	}
+}
+
+
+void Socket::_handleGetRequest(Request &request, Location *location, int client_fd)
+{
+	if (location && !location->getRedirect()){
+		std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: " + location->getHttpRedirection() + "\r\nContent-Length: 0\r\n\r\n";
+		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+			throw InternalServerError500();
+		return ;
+	}
+
+	std::string path;
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+
+	if (pathIsDirectory(path)){
+		std::string indexPath = path;
+
+		if (location && !location->getDefaultFile().empty())
+			indexPath += "/" + location->getDefaultFile();
+		else if (location && location->getAutoindex())
+		{
+			indexPath += "/index.html";
+
+			std::ifstream indexFile(indexPath.c_str());
+			if (indexFile){
+				std::string content((std::istreambuf_iterator<char>(indexFile)), std::istreambuf_iterator<char>());
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+				if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+					throw InternalServerError500();
+			}
+			else{
+				std::string content = listDirectory(path);
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+				if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+					throw InternalServerError500();
+			}
+			indexFile.close();
+			return;
+		}
+		else
+			throw BadRequest();
+	}
+
+	std::ifstream file(path.c_str());
+	if (!file){
+		file.close();
+		throw NotFound404();
+	}
+
+	if (access(path.c_str(), R_OK) == -1){
+		file.close();
+		throw Forbidden403();
+	}
+
+	if (location){
+		std::string	file_extension = path.substr(path.find_last_of('.'));
+		if (location->getUseCGI() && !location->getCGIPath(file_extension).empty()){
+			this->_handleCGI(request, location, client_fd);
+			file.close();
+			return ;
+		}
+	}
+
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	file.close();
+	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
+}
+
+
+void	Socket::_handleUpload(Request &request, Location *location, int client_fd)
+{
+	std::string path = location->getRoot() + request.getPath();
+
+	if (pathIsDirectory(path))
+		throw BadRequest();
+
+    std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
+    if (!file)
+		throw InternalServerError500();
+
+	if (access(path.c_str(), W_OK) == -1){
+		file.close();
+		throw Forbidden403();
+	}
+
+    std::string body = request.getBody();
+    file << body;
+    file.close();
+    std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+    if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
+}
+
+void Socket::_handlePostRequest(Request &request, Location *location, int client_fd)
+{
+	if (location && location->getFileUpload())
+		return this->_handleUpload(request, location, client_fd);
+	std::string	path;
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+
+	if (pathIsDirectory(path))
+		path += "/uploadedData.txt";
+
+	std::ofstream file(path.c_str(), std::ios::out | std::ios::app);
+	if (!file) {
+		file.open(path.c_str(), std::ios::out | std::ios::trunc);
+		if (!file) {
+			file.close();
+			throw InternalServerError500();
+		}
+		std::string body = request.getBody();
+		file << body;
+		file.close();
+		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+			throw InternalServerError500();
+		return ;
+	}
+	if (location && location->getUseCGI()){
+		if (path.find_last_of('.') == std::string::npos)
+			throw BadRequest();
+		std::string	file_extension = path.substr(path.find_last_of('.'));
+		if (!location->getCGIPath(file_extension).empty()){
+			this->_handleCGI(request, location, client_fd);
+			file.close();
+			return ;
+		}
+	}
+
+	if (access(path.c_str(), W_OK) == -1){
+		file.close();
+		throw Forbidden403();
+	}
+
+	std::string body = request.getBody() + "\n";
+	file << body;
+	file.close();
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
+}
+
+void	Socket::_handleDeleteRequest(Request &request, Location *location,int client_fd)
+{
+	std::string	path;
+	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+
+	if (std::remove(path.c_str()) != 0)
+		throw NotFound404();
+	std::string response = "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n";
+	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
+}
+
+
+
+static std::string	listDirectory(const std::string &path)
+{
+	std::string response = "<html><head><title>Index of " + path + "</title></head><body><h1>Index of " + path + "</h1><ul>";
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(path.c_str())) != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			response += "<li><a href=\"" + std::string(ent->d_name) + "\">" + std::string(ent->d_name) + "</a></li>";
+		}
+		closedir(dir);
+	}
+	response += "</ul></body></html>";
+	return response;
+}
+
+
+std::string	Socket::_execCGI(Request &request, Location *location)
+{
+	std::string	request_method = "REQUEST_METHOD=" + request.getMethodString();
+	if (request.getQuery().empty())
+		request.setQuery(request.getBody());
+	std::string	query_string = "QUERY_STRING=" + request.getQuery();
+	std::string	content_length = "CONTENT_LENGTH=" + strSizeToStr(request.getBody());
+	std::string	extension = request.getPath().substr(request.getPath().find_last_of('.'));
+	std::string cgi_handler = location->getCGIPath(extension);
+
+	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
+	std::string	path = location->getRoot() + request.getPath();
+	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
+
+	pid_t 	pid;
+	int 	pipe_out[2];
+	int 	pipe_in[2];
+	int 	status = 0;
+
+	if (pipe(pipe_out) == -1 || pipe(pipe_in) == -1)
+		throw InternalServerError500();
+	pid = fork();
+	if (pid == -1)
+		throw InternalServerError500();
+
+	//child process
+	if (pid == 0)
+	{
+		close(pipe_out[0]);
+		close(pipe_in[1]);
+		if (dup2(pipe_out[1], STDOUT_FILENO) == -1 || dup2(pipe_in[0], STDIN_FILENO) == -1)
+			throw InternalServerError500();
+		close(pipe_out[1]);
+		close(pipe_in[0]);
+
+		if (access(cgi_handler.c_str(), X_OK) == -1)
+			throw BadGateway502();
+		if (execve(const_cast<const char*>(cgi_handler.c_str()), const_cast<char* const*>(argv), const_cast<char* const*>(env)) == -1)
+			throw BadGateway502();
+
+		std::exit(EXIT_SUCCESS);
+	}
+
+	//parent process
+	else
+	{
+		close(pipe_out[1]);
+		close(pipe_in[0]);
+
+		//put request body into pipe for cgi handler to read
+		write(pipe_in[1], request.getBody().c_str(), request.getBody().size());
+		close(pipe_in[1]);
+
+		char 				buffer[2048];
+		int 				bytes_read;
+		std::stringstream 	ss;
+
+		while ((bytes_read = read(pipe_out[0], buffer, 2047)) > 0 || ss.eof() || ss.fail()){
+			if (bytes_read == -1)
+				throw BadGateway502();
+			buffer[bytes_read] = '\0';
+			ss << buffer;
+		}
+		close(pipe_out[0]);
+
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			throw BadGateway502();
+
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
+		return response;
+	}
+}
+
+void	Socket::_handleCGI(Request &request, Location *location, int client_fd)
+{
+	int backup_stdin = dup(STDIN_FILENO);
+	if (backup_stdin == -1)
+		throw InternalServerError500();
+	int backup_stdout = dup(STDOUT_FILENO);
+	if (backup_stdout  == -1)
+		throw InternalServerError500();
+
+	std::string content = this->_execCGI(request, location);
+
+	if (dup2(backup_stdin, STDIN_FILENO) == -1 || dup2(backup_stdout, STDOUT_FILENO) == -1)
+		throw InternalServerError500();
+	close(backup_stdin);
+	close(backup_stdout);
+
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	if (send(client_fd,  response.c_str(), response.size(), 0) == -1)
+		throw InternalServerError500();
 }
