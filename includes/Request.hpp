@@ -21,7 +21,6 @@
 
 class Request {
 	private:
-		// int									_confd;
 		Methods								_method;
 		std::string							_path;
 		bool								_pathIsDirectory;
@@ -31,13 +30,10 @@ class Request {
 		std::string							_body;
 		std::string							_query;
 
-		// Location							*_location;
-		// Socket								&_socket;
 
 	public:
 		Request();
 		Request(std::string request);
-		// Request(std::string request, Socket &socket, int confd);
 		Request(Request &src);
 		Request &operator=(Request &src);
 		Request &operator=(const Request &src);
@@ -59,11 +55,6 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-		// void								setLocation(Location *location);
-		// Location							*getLocation() const;
-		// Socket								&getSocket() const;
-		// int									getConfd() const;
-		// void								setConfd(int confd);
 
 		bool								pathIsDirectory() const;
 };

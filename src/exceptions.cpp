@@ -40,6 +40,16 @@ const char *BadGateway502::what() const throw()
 	return "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n";
 }
 
+const char *ContentTooLarge413::what() const throw()
+{
+	return "HTTP/1.1 413 Content Too Large	\r\nContent-Length: 0\r\n\r\n";
+}
+
+const char *URITooLong414::what() const throw()
+{
+	return "HTTP/1.1 414 URI Too Long	\r\nContent-Length: 0\r\n\r\n";
+}
+
 const char *InvalidConfigFile::what() const throw()
 {
 	return "Config file is invalid";
