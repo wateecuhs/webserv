@@ -115,7 +115,6 @@ void Server::startServer()
 							{
 								std::cout << "sending response" << std::endl;
 								it->sendResponse(it_client->second.getRequest(), it_client->first);
-								// implementer send reponse qui prend en param la request et le fd du client (fd auquel envoyer)
 							}
 						}
 					}

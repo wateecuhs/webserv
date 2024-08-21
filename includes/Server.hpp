@@ -37,7 +37,6 @@ class Server
 		int						getEpollFd() const;
 		void					startServer();
 		void					listenSockets();
-		void					addEvent();
 };
 
 #endif
