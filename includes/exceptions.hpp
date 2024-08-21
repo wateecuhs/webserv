@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:33:44 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/05 17:11:47 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/09 16:24:41 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@ class NotFound404: public std::exception {
 };
 
 class MethodNotAllowed405: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+
+class RequestTimeout408: public std::exception {
 	public:
 		virtual const char *what() const throw();
 };

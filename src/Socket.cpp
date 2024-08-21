@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 12:00:20 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/21 17:05:56 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -309,9 +309,12 @@ void Socket::_methodHandler(Request& request, int client_fd)
 
 void Socket::_handleGetRequest(Request &request, Location *location, int client_fd)
 {
-	if (location && location->getRedirect()) {
-		std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: " + location->getHttpRedirection() + "\r\nContent-Length: 0\r\n\r\n";
-		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	if (location && !location->getRedirect()){
+		// std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: " + location->getHttpRedirection() + "\r\nContent-Length: 0\r\n\r\n";
+		std::pair<std::string, std::string> header("Location", location->getHttpRedirection());
+		request.setResponse("301 Moved Permanently", header, "");
+		// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 			throw InternalServerError500();
 		return ;
 	}
@@ -319,32 +322,50 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 	std::string path;
 	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 
-	if (pathIsDirectory(path)) {
-		std::string indexPath = path;
-
-		if (location && !location->getDefaultFile().empty())
-			indexPath += "/" + location->getDefaultFile();
-		else if (location && location->getAutoindex())
-		{
-			indexPath += "/index.html";
-			std::ifstream indexFile(indexPath.c_str());
-			if (indexFile) {
-				std::string content((std::istreambuf_iterator<char>(indexFile)), std::istreambuf_iterator<char>());
-				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-				if (send(client_fd, response.c_str(), response.size(), 0) == -1)
-					throw InternalServerError500();
-			}
-			else {
+	if (pathIsDirectory(path)){
+		if (location){
+			if (location->getAutoindex()){
 				std::string content = listDirectory(path);
-				std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-				if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+				// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+				request.setResponse("200 OK", content);
+				// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+				if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 					throw InternalServerError500();
+				return ;
 			}
-			indexFile.close();
-			return;
+			else if (!location->getDefaultFile().empty()){
+				path += "/" + location->getDefaultFile();
+			}
 		}
 		else
-			throw NotFound404();
+			path += "/index.html";
+
+		// std::string indexPath = path;
+
+		// if (location && !location->getDefaultFile().empty())
+		// 	indexPath += "/" + location->getDefaultFile();
+		// else if (location && location->getAutoindex())
+		// {
+		// 	indexPath += "/index.html";
+
+		// 	std::ifstream indexFile(indexPath.c_str());
+		// 	if (indexFile){
+		// 		std::string content((std::istreambuf_iterator<char>(indexFile)), std::istreambuf_iterator<char>());
+		// 		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+		// 		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		// 			throw InternalServerError500();
+		// 	}
+		// 	else{
+		// 		std::string content = listDirectory(path);
+		// 		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+		// 		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		// 			throw InternalServerError500();
+		// 	}
+		// 	indexFile.close();
+		// 	return;
+		// }
+		// else
+		// 	throw BadRequest();
 	}
 
 	std::ifstream file(path.c_str());
@@ -370,9 +391,11 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 	}
 
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	request.setResponse("200 OK", content);
 	file.close();
-	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
 
@@ -396,8 +419,10 @@ void	Socket::_handleUpload(Request &request, Location *location, int client_fd)
     std::string body = request.getBody();
     file << body;
     file.close();
-    std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-    if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+    // std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+	request.setResponse("201 Created", body);
+    // if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
 
@@ -421,8 +446,10 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 		std::string body = request.getBody();
 		file << body;
 		file.close();
-		std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		// std::string response = "HTTP/1.1 201 Created\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+		request.setResponse("201 Created", body);
+		// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 			throw InternalServerError500();
 		return ;
 	}
@@ -445,8 +472,10 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 	std::string body = request.getBody() + "\n";
 	file << body;
 	file.close();
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
-	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(body) + "\r\n\r\n" + body;
+	request.setResponse("200 OK", body);
+	// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
 
@@ -457,8 +486,10 @@ void	Socket::_handleDeleteRequest(Request &request, Location *location,int clien
 
 	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
-	std::string response = "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n";
-	if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	// std::string response = "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n";
+	request.setResponse("204 No Content", "");
+	// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
+	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
 
@@ -549,8 +580,8 @@ std::string	Socket::_execCGI(Request &request, Location *location)
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
 
-		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
-		return response;
+		// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(ss.str()) + "\r\n\r\n" + ss.str();
+		return ss.str();
 	}
 }
 
@@ -570,7 +601,9 @@ void	Socket::_handleCGI(Request &request, Location *location, int client_fd)
 	close(backup_stdin);
 	close(backup_stdout);
 
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-	if (send(client_fd,  response.c_str(), response.size(), 0) == -1)
+	// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	request.setResponse("200 OK", content);
+	// if (send(client_fd,  response.c_str(), response.size(), 0) == -1)
+	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }

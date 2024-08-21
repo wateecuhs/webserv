@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/09 15:48:56 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 16:58:41 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ class Request {
 		std::map<std::string, std::string>	_headers;
 		std::string							_body;
 		std::string							_query;
-
+		std::map<std::string, std::string>	_cookies;
+		bool								_hasCookies;
+		std::string							_response;
 
 	public:
 		Request();
@@ -55,8 +57,15 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-
 		bool								pathIsDirectory() const;
+		bool								hasCookies() const;
+		void								setHasCookies(bool hasCookies);
+		std::map<std::string, std::string>	getCookies() const;
+		std::string							getCookie(std::string key) const;
+		void								setCookie(std::string key, std::string value);
+		std::string							getResponse() const;
+		void								setResponse(std::string status, std::string content);
+		void								setResponse(std::string status, std::pair<std::string, std::string> header, std::string content);
 };
 
 #endif
