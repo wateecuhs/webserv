@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:08 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 16:59:11 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <cstring>
 #include <sys/stat.h>
 #include "exceptions.hpp"
+#include "utils.hpp"
 
 Request::Request() {}
 
@@ -24,7 +25,6 @@ Request::Request(std::string request)
 	size_t					headers_start;
 	size_t					headers_end;
 
-	// std::cout << "Request: " << std::endl << "'" << request << "'" <<std::endl;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -59,6 +59,9 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
+	this->_hasCookies = src.hasCookies();
+	this->_response = src.getResponse();
 	return *this;
 }
 
@@ -72,6 +75,9 @@ Request &Request::operator=(const Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
+	this->_hasCookies = src.hasCookies();
+	this->_response = src.getResponse();
 	return *this;
 }
 
@@ -125,6 +131,9 @@ Request::Request(const Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
+	this->_hasCookies = src.hasCookies();
+	this->_response = src.getResponse();
 }
 
 bool Request::pathIsDirectory() const
@@ -190,4 +199,68 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
+}
+
+bool Request::hasCookies() const
+{
+	return this->_hasCookies;
+}
+
+void Request::setHasCookies(bool hasCookies)
+{
+	this->_hasCookies = hasCookies;
+}
+
+std::map<std::string, std::string> Request::getCookies() const
+{
+	return this->_cookies;
+}
+
+std::string Request::getCookie(std::string key) const
+{
+	if (this->_cookies.find(key) == this->_cookies.end())
+		return "";
+	return this->_cookies.at(key);
+}
+
+void Request::setCookie(std::string key, std::string value)
+{
+	this->_cookies[key] = value;
+	this->_hasCookies = true;
+}
+
+std::string Request::getResponse() const
+{
+	return this->_response;
+}
+
+void Request::setResponse(std::string status, std::string content)
+{
+	std::string response = "HTTP/1.1 " + status;
+
+	if (this->hasCookies())
+	{
+		response += "\r\nSet-Cookie: ";
+		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
+			response += it->first + "=" + it->second + "; ";
+		response.pop_back();
+	}
+	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	this->_response = response;
+}
+
+void Request::setResponse(std::string status, std::pair<std::string, std::string> header, std::string content)
+{
+	std::string response = "HTTP/1.1 " + status;
+
+	if (this->hasCookies())
+	{
+		response += "\r\nSet-Cookie: ";
+		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
+			response += it->first + "=" + it->second + "; ";
+		response.pop_back();
+	}
+	response += "\r\n" + header.first + ": " + header.second;
+	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	this->_response = response;
 }
