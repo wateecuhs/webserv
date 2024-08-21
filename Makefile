@@ -19,21 +19,22 @@ HEADERS		=	parsing.hpp								\
 				Request.hpp								\
 				utils.hpp								\
 				Location.hpp							\
+				Client.hpp								\
+				Server.hpp								\
 				exceptions.hpp
 
 RAW_SOURCES	=	main.cpp								\
 				Request.cpp								\
 				Socket.cpp								\
-				parsing/conf_parsing.cpp				\
 				parsing/conf_utils.cpp					\
 				parsing/req_parsing_reqline.cpp			\
 				parsing/req_parsing_headers.cpp			\
-				method_handler.cpp						\
-				Location.cpp							\
-				utils.cpp								\
-				cgi_handler.cpp							\
 				exceptions.cpp							\
-				utils.cpp
+				Client.cpp								\
+				Server.cpp								\
+				Location.cpp							\
+				utils.cpp								
+
 
 
 OBJ_DIR		=	.build

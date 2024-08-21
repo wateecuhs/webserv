@@ -15,17 +15,13 @@
 # define REQUEST_HPP
 
 #include "enums.hpp"
-#include "Location.hpp"
-#include "Socket.hpp"
 #include <map>
 #include <iostream>
 #include <exception>
 
-class Location;
-class Socket;
-
 class Request {
 	private:
+		// int									_confd;
 		Methods								_method;
 		std::string							_path;
 		bool								_pathIsDirectory;
@@ -35,14 +31,17 @@ class Request {
 		std::string							_body;
 		std::string							_query;
 
-		Location							*_location;
-		Socket								&_socket;
+		// Location							*_location;
+		// Socket								&_socket;
 
-		Request();
 	public:
-		Request(std::string request, Socket &socket);
+		Request();
+		Request(std::string request);
+		// Request(std::string request, Socket &socket, int confd);
 		Request(Request &src);
 		Request &operator=(Request &src);
+		Request &operator=(const Request &src);
+		Request(const Request &src);
 		~Request();
 		Methods								getMethod() const;
 		std::string							getMethodString() const;
@@ -60,9 +59,11 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-		void								setLocation(Location *location);
-		Location							*getLocation() const;
-		Socket								&getSocket() const;
+		// void								setLocation(Location *location);
+		// Location							*getLocation() const;
+		// Socket								&getSocket() const;
+		// int									getConfd() const;
+		// void								setConfd(int confd);
 
 		bool								pathIsDirectory() const;
 };

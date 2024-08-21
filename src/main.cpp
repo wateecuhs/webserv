@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 11:02:54 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,94 +20,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <cstring>
+#include "Server.hpp"
 
-void	methodHandler(Request &request);
-// void	handleCGI(const Request &request, const Socket &socket);
-
-// void startSockets(std::vector<Socket> servers)
-// {
-// 	int			epfd;
-// 	epoll_event	ep_events[servers.size()];
-// 	int			client_socket;
-// 	int			triggered_events;
-// 	char		buf[2048] = {0};
-
-// 	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
-// 		it->startListening();
-// 	while (true)
-// 	{
-// 		// triggered_events = epoll_wait(epfd, ep_events, servers.size(), 50);
-// 		// std::cout << "triggered_events: " << triggered_events << std::endl;
-// 		// if (triggered_events > 0)
-// 		// {
-// 		// 	client_socket = accept(ep_events[0].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
-// 		// 	if (client_socket != -1)
-// 		// 	{
-// 		// 		recv(client_socket, buf, sizeof(buf), 0);
-// 		// 		try {
-// 		// 			std::cout << std::endl << buf << std::endl;
-// 		// 			for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
-// 		// 			{
-// 		// 				if (it->getFd() == ep_events[it - servers.begin()].data.fd)
-// 		// 				{
-// 		// 					Request rq(buf, *it);
-// 		// 					break;
-// 		// 				}
-// 		// 			}
-// 		// 		}
-// 		// 		catch (const std::exception &e) {
-// 		// 			send(client_socket, e.what(), strlen(e.what()), 0);
-// 		// 			close(client_socket);
-// 		// 			std::cout << e.what() << std::endl;
-// 		// 		}
-// 		// 	}
-// 		// }
-// 	}
-// }
-
-
-void startSockets(std::vector<Socket> servers)
-{
-	int			epfd;
-	epoll_event	ep_events[servers.size()];
-	int			client_socket;
-	int			triggered_events;
-	char		buf[2048] = {0};
-
-	epfd = epoll_create(1);
-	for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
-		it->startListening(epfd, ep_events[it - servers.begin()]);
-	while (true)
-	{
-		triggered_events = epoll_wait(epfd, ep_events, servers.size(), 0);
-		if (triggered_events > 0)
-		{
-			client_socket = accept(ep_events[0].data.fd, (sockaddr *)NULL, (socklen_t *)NULL);
-			if (client_socket != -1)
-			{
-				recv(client_socket, buf, sizeof(buf), 0);
-				try {
-					std::cout << std::endl << buf << std::endl;
-					for (std::vector<Socket>::iterator it = servers.begin(); it != servers.end(); it++)
-					{
-						if (it->getFd() == ep_events[it - servers.begin()].data.fd)
-						{
-							Request rq(buf, *it);
-							methodHandler(rq);
-							// std::cout << "loc path: " << rq.getLocation()->getPath() << std::endl;
-							break;
-						}
-					}
-				}
-				catch (const std::exception &e) {
-					send(client_socket, e.what(), strlen(e.what()), 0);
-					close(client_socket);
-					std::cout << e.what() << std::endl;
-				}
-			}
-		}
-	}
-}
+void methodHandler(Request& request);
 
 
 int main(int argc, char **argv)
@@ -118,10 +33,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::vector<Socket> servers;
 	try {
-		servers = parseConfig(argv[1]);
-		startSockets(servers);
+		Server server(argv[1]);
+		server.startServer();
 	}
 	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;
