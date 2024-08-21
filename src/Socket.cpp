@@ -326,9 +326,7 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 		if (location){
 			if (location->getAutoindex()){
 				std::string content = listDirectory(path);
-				// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 				request.setResponse("200 OK", content);
-				// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
 				if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 					throw InternalServerError500();
 				return ;
@@ -339,33 +337,6 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 		}
 		else
 			path += "/index.html";
-
-		// std::string indexPath = path;
-
-		// if (location && !location->getDefaultFile().empty())
-		// 	indexPath += "/" + location->getDefaultFile();
-		// else if (location && location->getAutoindex())
-		// {
-		// 	indexPath += "/index.html";
-
-		// 	std::ifstream indexFile(indexPath.c_str());
-		// 	if (indexFile){
-		// 		std::string content((std::istreambuf_iterator<char>(indexFile)), std::istreambuf_iterator<char>());
-		// 		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-		// 		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
-		// 			throw InternalServerError500();
-		// 	}
-		// 	else{
-		// 		std::string content = listDirectory(path);
-		// 		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
-		// 		if (send(client_fd, response.c_str(), response.size(), 0) == -1)
-		// 			throw InternalServerError500();
-		// 	}
-		// 	indexFile.close();
-		// 	return;
-		// }
-		// else
-		// 	throw BadRequest();
 	}
 
 	std::ifstream file(path.c_str());
@@ -391,10 +362,8 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 	}
 
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	// std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	request.setResponse("200 OK", content);
 	file.close();
-	// if (send(client_fd, response.c_str(), response.size(), 0) == -1)
 	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
