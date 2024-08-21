@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 22:43:45 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 23:02:14 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -318,7 +318,6 @@ void Socket::_methodHandler(Request& request, int client_fd)
 	}
 }
 
-
 void Socket::_handleGetRequest(Request &request, Location *location, int client_fd)
 {
 	if (location && !location->getRedirect()) {
@@ -330,7 +329,8 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 	}
 
 	std::string path;
-	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path)) {
 		if (location){
@@ -376,10 +376,12 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 		throw InternalServerError500();
 }
 
-
 void	Socket::_handleUpload(Request &request, Location *location, int client_fd)
 {
-	std::string path = location->getRoot() + request.getPath();
+	// std::string path = location->getRoot() + request.getPath();
+	// std::string path = location->getRoot() + request.getPath().substr(location->getPath().size());
+	std::string path;
+	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path))
 		throw BadRequest();
@@ -405,8 +407,10 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 {
 	if (location && location->getFileUpload())
 		return this->_handleUpload(request, location, client_fd);
+
 	std::string	path;
-	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path))
 		path += "/uploadedData.txt";
@@ -453,7 +457,8 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 void	Socket::_handleDeleteRequest(Request &request, Location *location,int client_fd)
 {
 	std::string	path;
-	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
+	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (std::remove(path.c_str()) != 0)
 		throw NotFound404();
@@ -461,8 +466,6 @@ void	Socket::_handleDeleteRequest(Request &request, Location *location,int clien
 	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
 		throw InternalServerError500();
 }
-
-
 
 static std::string	listDirectory(const std::string &path)
 {
@@ -478,7 +481,6 @@ static std::string	listDirectory(const std::string &path)
 	response += "</ul></body></html>";
 	return response;
 }
-
 
 std::string	Socket::_execCGI(Request &request, Location *location)
 {
