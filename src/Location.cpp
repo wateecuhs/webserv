@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/09 15:50:14 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 12:01:03 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,12 @@ Location::Location(std::stringstream &iss, std::string word)
 	if (validateLocation(word) == false)
 		throw InvalidConfigFile();
 	for (int i = 0; i < 3; i++)
-		this->_methods[i] = false;
+		this->_methods[i] = true;
 	this->_path = word;
+	this->_file_upload = false;
+	this->_useCGI = false;
+	this->_autoindex = false;
+	this->_redirect = false;
 
 	while (iss >> word)
 	{
@@ -48,8 +52,11 @@ Location::Location(std::stringstream &iss, std::string word)
 					state = loc_root;
 				else if (word == "cgi_extension")
 					state = loc_CGI_map;
-				else if (word == "methods_allowed")
+				else if (word == "methods_allowed") {
+					for (int i = 0; i < 3; i++)
+						this->_methods[i] = false;
 					state = loc_methods;
+				}
 				else if (word == "auto_index")
 					state = loc_autoindex;
 				else if (word == "default_file")
@@ -120,6 +127,7 @@ Location::Location(std::stringstream &iss, std::string word)
 			case loc_http_redirection:
 				if (validateURI(shaved_word) == false)
 					throw InvalidConfigFile();
+				this->_redirect = true;
 				this->_http_redirection = shaved_word;
 				state = trailing_semicolon ? loc_new_token : loc_semicolon;
 				break;
@@ -290,4 +298,14 @@ std::string Location::getPath() const
 void Location::setPath(std::string path)
 {
 	this->_path = path;
+}
+
+bool Location::getRedirect() const
+{
+	return this->_redirect;
+}
+
+void Location::setRedirect(bool redirect)
+{
+	this->_redirect = redirect;
 }

@@ -76,7 +76,7 @@ void parseRequestLine(std::string r, Request &request)
 					break;
 				if (*it < 'A' || *it > 'Z')
 					throw BadRequest();
-				state = req_method;							//au fait ça (+ break) sert à quoi si de toute façon on passe à la suite avec switch ?
+				state = req_method;
 				cur_begin = it;
 				break;
 			case req_method:

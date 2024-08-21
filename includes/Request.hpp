@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/09 17:48:04 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 15:33:52 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,13 @@
 # define REQUEST_HPP
 
 #include "enums.hpp"
-#include "Location.hpp"
-#include "Socket.hpp"
 #include <map>
 #include <iostream>
 #include <exception>
 
-class Location;
-class Socket;
-
 class Request {
 	private:
+		// int									_confd;
 		Methods								_method;
 		std::string							_path;
 		bool								_pathIsDirectory;
@@ -38,14 +34,17 @@ class Request {
 		bool								_hasCookies;
 		std::string							_response;
 
-		Location							*_location;
-		Socket								&_socket;
+		// Location							*_location;
+		// Socket								&_socket;
 
-		Request();
 	public:
-		Request(std::string request, Socket &socket);
+		Request();
+		Request(std::string request);
+		// Request(std::string request, Socket &socket, int confd);
 		Request(Request &src);
 		Request &operator=(Request &src);
+		Request &operator=(const Request &src);
+		Request(const Request &src);
 		~Request();
 		Methods								getMethod() const;
 		std::string							getMethodString() const;
@@ -63,13 +62,16 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-		void								setLocation(Location *location);
-		Location							*getLocation() const;
-		Socket								&getSocket() const;
+		// void								setLocation(Location *location);
+		// Location							*getLocation() const;
+		// Socket								&getSocket() const;
+		// int									getConfd() const;
+		// void								setConfd(int confd);
 
 		bool								pathIsDirectory() const;
 		bool								hasCookies() const;
 		void								setHasCookies(bool hasCookies);
+		std::map<std::string, std::string>	getCookies() const;
 		std::string							getCookie(std::string key) const;
 		void								setCookie(std::string key, std::string value);
 		std::string							getResponse() const;

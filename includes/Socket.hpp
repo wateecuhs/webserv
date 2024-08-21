@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 10:29:36 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 15:41:02 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 11:50:29 by panger           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <vector>
 #include "Location.hpp"
 #include <sys/epoll.h>
+#include "Client.hpp"
 
 class Location;
 
@@ -34,7 +35,14 @@ class Socket
 		int									_epoll_fd;
 		struct epoll_event					_event;
 		struct epoll_event					_events[10];
-
+		std::map<int, Client>				_clients;
+		void								_methodHandler(Request& request, int client_fd);
+		void								_handleDeleteRequest(Request &request, Location *location, int client_fd);
+		void								_handleGetRequest(Request &request, Location *location, int client_fd);
+		void								_handlePostRequest(Request &request, Location *location, int client_fd);
+		void								_handleUpload(Request &request, Location *location, int client_fd);
+		std::string							_execCGI(Request &request, Location *location);
+		void								_handleCGI(Request &request, Location *location, int client_fd);
 		Socket();
 	public:
 		Socket(std::stringstream &iss, std::string word);
@@ -56,9 +64,11 @@ class Socket
 		int									getBodySize() const;
 		void								addLocation(Location location);
 		std::vector<Location>				getLocations() const;
-		int 								startListening();
-		int									startListening(int epfd, epoll_event &ep_event);
+		int									startListening(int epfd);
 		void								httpListen();
+		int									acceptConnection(int event_fd);
+		std::map<int, Client>				&getClients();
+		void								sendResponse(Request request, int client_fd);
 };
 
 #endif

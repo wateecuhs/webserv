@@ -32,6 +32,7 @@ class Location
 		bool								_file_upload;
 		std::string							_upload_path;
 		std::string							_http_redirection;
+		bool								_redirect;
 
 		Location();
 	public:
@@ -62,6 +63,8 @@ class Location
 		std::string							getHttpRedirection() const;
 		std::string							getPath() const;
 		void								setPath(std::string path);
+		bool								getRedirect() const;
+		void								setRedirect(bool redirect);
 };
 
 #endif

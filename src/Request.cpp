@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/09 17:52:59 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 15:35:36 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,14 @@
 #include "exceptions.hpp"
 #include "utils.hpp"
 
-Request::Request(std::string request, Socket &socket): _socket(socket)
+Request::Request() {}
+
+Request::Request(std::string request)
 {
 	size_t					headers_start;
 	size_t					headers_end;
-	size_t					longest_length = 0;
-	std::vector<Location>	locations;
-	std::string				tmp_path;
 
-	this->_location = NULL;
+	// std::cout << "Request: " << std::endl << "'" << request << "'" <<std::endl;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -39,26 +38,14 @@ Request::Request(std::string request, Socket &socket): _socket(socket)
 	parseHeaders(request.substr(headers_start, headers_end), *this);
 	setHost(this->_headers["Host"]);
 
-	locations = this->_socket.getLocations();
-	for (size_t i = 0; i < locations.size(); i++)
-	{
-		tmp_path = locations[i].getPath();
-		if (this->_path.rfind(tmp_path, 0) == 0 && tmp_path.length() > longest_length)
-		{
-			longest_length = tmp_path.length();
-			this->_location = new Location(locations[i]);
-		}
-	}
 	setBody(request.substr(headers_end + 4));
 }
 
 Request::~Request()
 {
-	if (this->_location)
-		delete this->_location;
 }
 
-Request::Request(Request &src): _socket(src._socket)
+Request::Request(Request &src)
 {
 	*this = src;
 }
@@ -73,11 +60,25 @@ Request &Request::operator=(Request &src)
 	this->_body = src.getBody();
 	this->_host = src.getHost();
 	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
 	this->_hasCookies = src.hasCookies();
-	this->_cookies = src._cookies;
-	if (this->_location)
-		delete this->_location;
-	this->_location = new Location(*src.getLocation());
+	this->_response = src.getResponse();
+	return *this;
+}
+
+Request &Request::operator=(const Request &src)
+{
+	this->_method = src.getMethod();
+	this->_path = src.getPath();
+	this->_pathIsDirectory = src.pathIsDirectory();
+	this->_http_version = src.getHTTPVersion();
+	this->_headers = src.getHeaders();
+	this->_body = src.getBody();
+	this->_host = src.getHost();
+	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
+	this->_hasCookies = src.hasCookies();
+	this->_response = src.getResponse();
 	return *this;
 }
 
@@ -119,6 +120,21 @@ void Request::setPath(std::string path)
 		else
 			this->_pathIsDirectory = false;
 	}
+}
+
+Request::Request(const Request &src)
+{
+	this->_method = src.getMethod();
+	this->_path = src.getPath();
+	this->_pathIsDirectory = src.pathIsDirectory();
+	this->_http_version = src.getHTTPVersion();
+	this->_headers = src.getHeaders();
+	this->_body = src.getBody();
+	this->_host = src.getHost();
+	this->_query = src.getQuery();
+	this->_cookies = src.getCookies();
+	this->_hasCookies = src.hasCookies();
+	this->_response = src.getResponse();
 }
 
 bool Request::pathIsDirectory() const
@@ -184,21 +200,6 @@ void Request::setQuery(std::string query)
 std::string Request::getQuery() const
 {
 	return this->_query;
-}
-
-void Request::setLocation(Location *location)
-{
-	this->_location = location;
-}
-
-Location *Request::getLocation() const
-{
-	return this->_location;
-}
-
-Socket &Request::getSocket() const
-{
-	return this->_socket;
 }
 
 bool Request::hasCookies() const

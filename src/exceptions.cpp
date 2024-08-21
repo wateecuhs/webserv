@@ -57,5 +57,5 @@ const char *BadInput::what() const throw()
 
 const char *BadRequest::what() const throw()
 {
-	return "Bad Request";
+	return "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n";
 }
