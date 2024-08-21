@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 23:02:14 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 23:13:22 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -493,7 +493,9 @@ std::string	Socket::_execCGI(Request &request, Location *location)
 	std::string cgi_handler = location->getCGIPath(extension);
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
-	std::string	path = location->getRoot() + request.getPath();
+	// std::string	path = location->getRoot() + request.getPath();
+	std::string	path;
+	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
 
 	pid_t 	pid;
