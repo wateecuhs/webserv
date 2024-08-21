@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/21 15:33:52 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 15:39:33 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 
 class Request {
 	private:
-		// int									_confd;
 		Methods								_method;
 		std::string							_path;
 		bool								_pathIsDirectory;
@@ -34,13 +33,9 @@ class Request {
 		bool								_hasCookies;
 		std::string							_response;
 
-		// Location							*_location;
-		// Socket								&_socket;
-
 	public:
 		Request();
 		Request(std::string request);
-		// Request(std::string request, Socket &socket, int confd);
 		Request(Request &src);
 		Request &operator=(Request &src);
 		Request &operator=(const Request &src);
@@ -62,12 +57,6 @@ class Request {
 		std::string							getHost() const;
 		void								setQuery(std::string query);
 		std::string							getQuery() const;
-		// void								setLocation(Location *location);
-		// Location							*getLocation() const;
-		// Socket								&getSocket() const;
-		// int									getConfd() const;
-		// void								setConfd(int confd);
-
 		bool								pathIsDirectory() const;
 		bool								hasCookies() const;
 		void								setHasCookies(bool hasCookies);

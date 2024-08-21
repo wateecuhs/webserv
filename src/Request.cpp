@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 15:35:36 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 15:39:49 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ Request::Request(std::string request)
 	size_t					headers_start;
 	size_t					headers_end;
 
-	// std::cout << "Request: " << std::endl << "'" << request << "'" <<std::endl;
 	headers_start = request.find("\r\n");
 	headers_end = request.find("\r\n\r\n");
 	if (headers_start == std::string::npos)
@@ -210,6 +209,11 @@ bool Request::hasCookies() const
 void Request::setHasCookies(bool hasCookies)
 {
 	this->_hasCookies = hasCookies;
+}
+
+std::map<std::string, std::string> Request::getCookies() const
+{
+	return this->_cookies;
 }
 
 std::string Request::getCookie(std::string key) const
