@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 15:39:49 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 16:59:11 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,6 +245,22 @@ void Request::setResponse(std::string status, std::string content)
 			response += it->first + "=" + it->second + "; ";
 		response.pop_back();
 	}
+	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
+	this->_response = response;
+}
+
+void Request::setResponse(std::string status, std::pair<std::string, std::string> header, std::string content)
+{
+	std::string response = "HTTP/1.1 " + status;
+
+	if (this->hasCookies())
+	{
+		response += "\r\nSet-Cookie: ";
+		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
+			response += it->first + "=" + it->second + "; ";
+		response.pop_back();
+	}
+	response += "\r\n" + header.first + ": " + header.second;
 	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	this->_response = response;
 }

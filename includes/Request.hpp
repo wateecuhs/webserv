@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/21 15:39:33 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/21 16:58:41 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ class Request {
 		void								setCookie(std::string key, std::string value);
 		std::string							getResponse() const;
 		void								setResponse(std::string status, std::string content);
+		void								setResponse(std::string status, std::pair<std::string, std::string> header, std::string content);
 };
 
 #endif
