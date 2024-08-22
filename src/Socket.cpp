@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 15:12:51 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 16:57:41 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,13 +276,16 @@ void Socket::sendResponse(Request request, int client_fd)
 	}
 	catch (const std::exception &e) {
 		std::string response = e.what();
-		int 		status_code = ft_strtoi(response.substr(9, 3));
+		// int 		status_code = ft_strtoi(response.substr(9, 3));
+		int 		status_code = ft_strtoi(response.substr(0, 3));
 
 		std::cout << response.substr(0, response.find("\r\n")) << " - " << request.getPath() << std::endl;
+		// std::cout << "1" << request.getResponse() << std::endl;
 
 		if (_error_pages.find(status_code) != _error_pages.end()) {
 			std::ifstream file(_error_pages[status_code].c_str());
 			if (!file) {
+				request.setResponse(response, "");
 				file.close();
 				close(client_fd);
 				return ;
@@ -293,6 +296,7 @@ void Socket::sendResponse(Request request, int client_fd)
 		}
 		else
 			request.setResponse(response, "");
+		// std::cout << "2" << request.getResponse() << std::endl;
 		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
 			close(client_fd);
 			return ;
@@ -343,7 +347,6 @@ void Socket::_methodHandler(Request& request, int client_fd)
 				this->_handleDeleteRequest(request, &locations[loc_idx], client_fd);
 			break;
 		default:
-			// std::cout << "Method not implemented" << std::endl;
 			throw MethodNotAllowed405();
 	}
 }
@@ -380,17 +383,20 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 
 	std::ifstream file(path.c_str());
 	if (!file){
+		request.setResponse("404 Not Found", "");
 		file.close();
 		throw NotFound404();
 	}
 
 	if (access(path.c_str(), R_OK) == -1) {
+		request.setResponse("403 Forbidden", "");
 		file.close();
 		throw Forbidden403();
 	}
 
 	if (location) {
 		std::string	file_extension = path.substr(path.find_last_of('.'));
+		std::cout << file_extension << std::endl;
 		if (location->getUseCGI() && !location->getCGIPath(file_extension).empty()) {
 			this->_handleCGI(request, location, client_fd);
 			file.close();
