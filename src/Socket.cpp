@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 16:57:41 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 17:24:08 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -451,8 +451,10 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 	if (!file) {
 		file.open(path.c_str(), std::ios::out | std::ios::trunc);
 		if (!file) {
+			// std::cout << "BONJOUR PIERRE" << std::endl;
 			file.close();
-			throw InternalServerError500();
+			//open pas protege du coup
+			throw NotFound404();
 		}
 		std::string body = request.getBody();
 		file << body;
