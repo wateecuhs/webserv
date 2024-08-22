@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 13:15:51 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 14:16:38 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,8 +266,22 @@ void Socket::sendResponse(Request request, int client_fd)
 		this->_methodHandler(request, client_fd);
 	}
 	catch (const std::exception &e) {
+		std::string response = e.what();
+		int 		status_code = ft_strtoi(response.substr(9, 3));
+		
+		if (_error_pages.find(status_code) != _error_pages.end()) {
+			std::ifstream file(_error_pages[status_code].c_str());
+			if (!file)
+				throw InternalServerError500();
+			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			request.setResponse(response, content);
+			file.close();
+		}
+		else
+			request.setResponse(response, "");
 		std::cout << "Exception: " << e.what() << std::endl;
-		send(client_fd, e.what(), strlen(e.what()), 0);
+		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
+			throw InternalServerError500();
 		close(client_fd);
 	}
 }
