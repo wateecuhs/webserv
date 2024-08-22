@@ -252,10 +252,12 @@ void Socket::sendResponse(Request request, int client_fd)
 		if (request.getBody().size() > (size_t)this->_body_size)
 			throw ContentTooLarge413();
 		this->_methodHandler(request, client_fd);
+		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << std::endl;
 	}
 	catch (const std::exception &e) {
-		std::cout << "Exception: " << e.what() << std::endl;
 		send(client_fd, e.what(), strlen(e.what()), 0);
+		std::string r(e.what());
+		std::cout << r.substr(0, r.find("\r\n")) << std::endl;
 		close(client_fd);
 	}
 }
@@ -309,7 +311,7 @@ void Socket::_methodHandler(Request& request, int client_fd)
 
 void Socket::_handleGetRequest(Request &request, Location *location, int client_fd)
 {
-	if (location && !location->getRedirect()){
+	if (location && location->getRedirect()){
 		// std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: " + location->getHttpRedirection() + "\r\nContent-Length: 0\r\n\r\n";
 		std::pair<std::string, std::string> header("Location", location->getHttpRedirection());
 		request.setResponse("301 Moved Permanently", header, "");
@@ -321,7 +323,6 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 
 	std::string path;
 	location ? path = location->getRoot() + request.getPath() : path = request.getPath();
-
 	if (pathIsDirectory(path)){
 		if (location){
 			if (location->getAutoindex()){
@@ -331,7 +332,7 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 					throw InternalServerError500();
 				return ;
 			}
-			else if (!location->getDefaultFile().empty()){
+			else if (!location->getDefaultFile().empty()) {
 				path += "/" + location->getDefaultFile();
 			}
 		}
