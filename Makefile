@@ -27,8 +27,6 @@ RAW_SOURCES	=	main.cpp								\
 				Request.cpp								\
 				Socket.cpp								\
 				parsing/conf_utils.cpp					\
-				parsing/req_parsing_reqline.cpp			\
-				parsing/req_parsing_headers.cpp			\
 				exceptions.cpp							\
 				Client.cpp								\
 				Server.cpp								\

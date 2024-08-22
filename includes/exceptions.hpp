@@ -62,5 +62,12 @@ class BadRequest: public std::exception {
 		virtual const char *what() const throw();
 };
 
-
+class ContentTooLarge413: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+class URITooLong414: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
 #endif

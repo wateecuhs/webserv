@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <sys/wait.h>
 #include <cstdlib>
+#include <fcntl.h>
 
 static std::string	listDirectory(const std::string &path);
 
@@ -37,6 +38,7 @@ Socket::Socket(std::stringstream &iss, std::string word)
 	_locations = std::vector<Location>();
 	std::string		shaved_word;
 	bool			trailing_semicolon;
+	this->_body_size = 4096;
 
 	while (iss >> word)
 	{
@@ -109,6 +111,14 @@ Socket::Socket(std::stringstream &iss, std::string word)
 	throw InvalidConfigFile();
 }
 
+void setFDNonBlocking(int fd)
+{
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1)
+		throw std::runtime_error("Failed to get file descriptor flags");
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
+		throw std::runtime_error("Failed to set file descriptor flags");
+}
 
 int Socket::startListening(int epfd)
 {
@@ -117,39 +127,31 @@ int Socket::startListening(int epfd)
 	epoll_event event;
 
 	this->_fd = socket(AF_INET, SOCK_STREAM, 0);
-
+	if (this->_fd == -1)
+		throw std::runtime_error("Failed to create socket");
+	setFDNonBlocking(this->_fd);
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(_port);
 	if (_host == "*")
 		server_addr.sin_addr.s_addr = INADDR_ANY;
 	else
-		inet_aton(_host.c_str(), &server_addr.sin_addr);
+	{
+		if (inet_aton(_host.c_str(), &server_addr.sin_addr) == -1)
+			throw std::runtime_error("Failed to convert host to network address");
+	}
 
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-	bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr));
+	if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1)
+		throw std::runtime_error("Failed to set socket options");
+	if (bind(this->_fd, (sockaddr *)&server_addr, sizeof(server_addr)) == -1)
+		throw std::runtime_error("Failed to bind socket");
 
 	event.data.fd = this->_fd;
 	event.events = EPOLLIN | EPOLLPRI;
-	epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &event);
-	listen(this->_fd, 5);
+	if (epoll_ctl(epfd, EPOLL_CTL_ADD, this->_fd, &event) == -1)
+		throw std::runtime_error("Failed to add socket to epoll");
+	if (listen(this->_fd, 5) == -1)
+		throw std::runtime_error("Failed to listen on socket");
 	return (this->_fd);
-}
-
-void Socket::httpListen()
-{
-	int client_socket;
-	int triggered_events = epoll_wait(_epoll_fd, _events, 10, 0);
-
-	for (int i = 0; i < triggered_events; i++) {
-		if (_events[i].data.fd == this->_fd) {
-			client_socket = accept(this->_fd, (sockaddr *)NULL, (socklen_t *)NULL);
-			if (client_socket == -1)
-				throw std::runtime_error("Failed to accept client socket");
-			_event.data.fd = client_socket;
-			_event.events = EPOLLIN | EPOLLOUT;
-			epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
-		}
-	}
 }
 
 Socket::~Socket()
@@ -249,8 +251,10 @@ int Socket::getFd() const
 int Socket::acceptConnection(int event_fd)
 {
 	int client_socket = accept(event_fd, (sockaddr *)NULL, (socklen_t *)NULL);
+
 	if (client_socket == -1)
 		throw std::runtime_error("Failed to accept client socket");
+	setFDNonBlocking(this->_fd);
 	_clients[client_socket] = Client(client_socket);
 	return client_socket;
 }
@@ -263,11 +267,17 @@ std::map<int, Client> &Socket::getClients()
 void Socket::sendResponse(Request request, int client_fd)
 {
 	try {
+		if (request.getPath().size() > 1000)
+			throw URITooLong414();
+		if (request.getBody().size() > (size_t)this->_body_size)
+			throw ContentTooLarge413();
 		this->_methodHandler(request, client_fd);
+		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 	}
 	catch (const std::exception &e) {
-		std::cout << "Exception: " << e.what() << std::endl;
 		send(client_fd, e.what(), strlen(e.what()), 0);
+		std::string r(e.what());
+		std::cout << r.substr(0, r.find("\r\n")) << " - " << request.getPath() << std::endl;
 		close(client_fd);
 	}
 }

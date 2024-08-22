@@ -39,7 +39,6 @@ Location::Location(std::stringstream &iss, std::string word)
 			shaved_word = word.substr(0, word.size() - 1);
 		else
 			shaved_word = word;
-
 		switch (state) {
 			case loc_brace_open:
 				if (word != "{")
@@ -157,6 +156,7 @@ Location::Location(const Location &copy)
 	this->_file_upload = copy.getFileUpload();
 	this->_upload_path = copy.getUploadPath();
 	this->_http_redirection = copy.getHttpRedirection();
+	this->_redirect = copy.getRedirect();
 }
 
 Location &Location::operator=(const Location &copy)
@@ -175,6 +175,7 @@ Location &Location::operator=(const Location &copy)
 	this->_file_upload = copy.getFileUpload();
 	this->_upload_path = copy.getUploadPath();
 	this->_http_redirection = copy.getHttpRedirection();
+	this->_redirect = copy.getRedirect();
 	return *this;
 }
 
