@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 13:15:51 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 15:12:51 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,9 +275,28 @@ void Socket::sendResponse(Request request, int client_fd)
 		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 	}
 	catch (const std::exception &e) {
-		send(client_fd, e.what(), strlen(e.what()), 0);
-		std::string r(e.what());
-		std::cout << r.substr(0, r.find("\r\n")) << " - " << request.getPath() << std::endl;
+		std::string response = e.what();
+		int 		status_code = ft_strtoi(response.substr(9, 3));
+
+		std::cout << response.substr(0, response.find("\r\n")) << " - " << request.getPath() << std::endl;
+
+		if (_error_pages.find(status_code) != _error_pages.end()) {
+			std::ifstream file(_error_pages[status_code].c_str());
+			if (!file) {
+				file.close();
+				close(client_fd);
+				return ;
+			}
+			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			request.setResponse(response, content);
+			file.close();
+		}
+		else
+			request.setResponse(response, "");
+		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
+			close(client_fd);
+			return ;
+		}
 		close(client_fd);
 	}
 }
@@ -324,6 +343,7 @@ void Socket::_methodHandler(Request& request, int client_fd)
 				this->_handleDeleteRequest(request, &locations[loc_idx], client_fd);
 			break;
 		default:
+			// std::cout << "Method not implemented" << std::endl;
 			throw MethodNotAllowed405();
 	}
 }

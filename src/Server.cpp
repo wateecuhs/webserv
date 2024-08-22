@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 14:48:55 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void Server::startServer()
 			}
 		}
 	}
-	std::cout << "Signal received, closing server.." << std::endl;
+	std::cout << "\b\bSignal received, closing server.." << std::endl;
 }
 
 std::vector<Socket> Server::_parseServers(std::string content)
