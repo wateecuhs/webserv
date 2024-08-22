@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 23:13:22 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 13:15:51 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,7 +320,7 @@ void Socket::_methodHandler(Request& request, int client_fd)
 
 void Socket::_handleGetRequest(Request &request, Location *location, int client_fd)
 {
-	if (location && !location->getRedirect()) {
+	if (location && location->getRedirect()) {
 		std::pair<std::string, std::string> header("Location", location->getHttpRedirection());
 		request.setResponse("301 Moved Permanently", header, "");
 		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
@@ -329,7 +329,6 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 	}
 
 	std::string path;
-	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path)) {
@@ -378,8 +377,6 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 
 void	Socket::_handleUpload(Request &request, Location *location, int client_fd)
 {
-	// std::string path = location->getRoot() + request.getPath();
-	// std::string path = location->getRoot() + request.getPath().substr(location->getPath().size());
 	std::string path;
 	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
@@ -409,7 +406,6 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 		return this->_handleUpload(request, location, client_fd);
 
 	std::string	path;
-	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path))
@@ -457,7 +453,6 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 void	Socket::_handleDeleteRequest(Request &request, Location *location,int client_fd)
 {
 	std::string	path;
-	// location ? path = location->getRoot() + request.getPath() : path = request.getPath();
 	location && !location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (std::remove(path.c_str()) != 0)
@@ -493,7 +488,6 @@ std::string	Socket::_execCGI(Request &request, Location *location)
 	std::string cgi_handler = location->getCGIPath(extension);
 
 	const char 	*env[4] = {request_method.c_str(), query_string.c_str(), content_length.c_str(), NULL};
-	// std::string	path = location->getRoot() + request.getPath();
 	std::string	path;
 	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 	const char 	*argv[3] = {cgi_handler.c_str(), path.c_str(), NULL};
