@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 14:24:51 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 14:55:46 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,6 +272,7 @@ void Socket::sendResponse(Request request, int client_fd)
 		if (request.getBody().size() > (size_t)this->_body_size)
 			throw ContentTooLarge413();
 		this->_methodHandler(request, client_fd);
+		std::cout << "boop" << std::endl;
 		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 	}
 	catch (const std::exception &e) {
@@ -338,6 +339,7 @@ void Socket::_methodHandler(Request& request, int client_fd)
 				this->_handleDeleteRequest(request, &locations[loc_idx], client_fd);
 			break;
 		default:
+			// std::cout << "Method not implemented" << std::endl;
 			throw MethodNotAllowed405();
 	}
 }
