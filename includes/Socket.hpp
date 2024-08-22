@@ -20,7 +20,7 @@
 #include <sys/epoll.h>
 #include "Client.hpp"
 
-// class Location;
+class Location;
 
 class Socket
 {

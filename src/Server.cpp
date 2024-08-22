@@ -15,6 +15,10 @@
 #include "parsing.hpp"
 #include "exceptions.hpp"
 #include <unistd.h>
+#include <signal.h>
+#include <cstring>
+
+int sig = 0;
 
 Server::Server(std::string config): _epoll_events(10)
 {
@@ -72,11 +76,24 @@ void Server::listenSockets()
 		it->startListening(this->_epoll_fd);
 }
 
+void sigHandler(int sig_code)
+{
+	sig = sig_code;
+}
+
 void Server::startServer()
 {
-	std::map<int, Client> clients;
+	std::map<int, Client>	clients;
+	struct sigaction		action;
+
+	std::memset(&action, 0, sizeof(action));
+	action.sa_handler = sigHandler;
+	action.sa_flags = SA_SIGINFO;
+	if (sigaction(SIGINT, &action, NULL))
+		throw std::runtime_error("Initializing signal handler failed");
+
 	this->listenSockets();
-	while (true)
+	while (sig == 0)
 	{
 		int nfds = epoll_wait(_epoll_fd, _epoll_events.data(), _epoll_events.size(), 0);
 		for (int i = 0; i < nfds; i++)
@@ -120,6 +137,7 @@ void Server::startServer()
 			}
 		}
 	}
+	std::cout << "Signal received, closing server.." << std::endl;
 }
 
 std::vector<Socket> Server::_parseServers(std::string content)

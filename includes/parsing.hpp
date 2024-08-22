@@ -19,7 +19,6 @@
 #include <fstream>
 #include "Request.hpp"
 
-std::vector<Socket> parseConfig(std::string conf_path);
 void			parseRequestLine(std::string r, Request &request);
 void			parseHeaders(std::string r, Request &req);
 void			verifyAddHostPort(std::string content, Socket &socket);

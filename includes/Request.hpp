@@ -32,6 +32,13 @@ class Request {
 		std::map<std::string, std::string>	_cookies;
 		bool								_hasCookies;
 		std::string							_response;
+		void								_parseRequestLine(std::string r);
+		bool								_isHTTP(std::string r, int pos, int len);
+		std::string							_parseURI(std::string r);
+		float								_parseVersion(std::string r, int pos);
+		Methods								_parseMethod(std::string r, int len);
+		void								_parseCookies(std::string cookies);
+		void								_parseHeaders(std::string headers);
 
 	public:
 		Request();
