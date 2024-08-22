@@ -13,6 +13,9 @@
 #include "Client.hpp"
 #include <sys/socket.h>
 #include "Request.hpp"
+#include <unistd.h>
+#include "exceptions.hpp"
+#include <fcntl.h>
 
 Client::Client(): _fd(-1), _isReady(false)
 {
@@ -53,8 +56,10 @@ Request Client::getRequest() const
 
 void Client::readRequest()
 {
-	char buf[2048] = {0};
-	size_t cr = recv(_fd, buf, sizeof(buf), 0);
+	char buf[4096] = {0};
+	size_t cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
+	if (cr == 0)
+		throw InternalServerError500();
 	_request = Request(std::string(buf));
 	_isReady = true;
 }

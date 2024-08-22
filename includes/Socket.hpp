@@ -20,7 +20,7 @@
 #include <sys/epoll.h>
 #include "Client.hpp"
 
-// class Location;
+class Location;
 
 class Socket
 {
@@ -30,7 +30,7 @@ class Socket
 		int									_port;
 		std::map<int, std::string>			_error_pages;
 		std::vector<std::string>			_server_names;
-		int									_body_size;
+		size_t								_body_size;
 		std::vector<Location>				_locations;
 		int									_epoll_fd;
 		struct epoll_event					_event;

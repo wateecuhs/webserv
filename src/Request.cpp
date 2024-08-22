@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 
 #include "Request.hpp"
-#include "parsing.hpp"
 #include <sstream>
 #include <cstring>
 #include <sys/stat.h>
 #include "exceptions.hpp"
 #include "utils.hpp"
+#include <cstdlib>
 
 Request::Request() {}
 
@@ -33,8 +33,8 @@ Request::Request(std::string request)
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
 		throw BadRequest();
 
-	parseRequestLine(request.substr(0, headers_start), *this);
-	parseHeaders(request.substr(headers_start, headers_end), *this);
+	_parseRequestLine(request.substr(0, headers_start));
+	_parseHeaders(request.substr(headers_start, headers_end));
 	setHost(this->_headers["Host"]);
 
 	setBody(request.substr(headers_end + 4));
@@ -243,7 +243,7 @@ void Request::setResponse(std::string status, std::string content)
 		response += "\r\nSet-Cookie: ";
 		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
 			response += it->first + "=" + it->second + "; ";
-		response.pop_back();
+		response = response.substr(0, response.size() - 2);
 	}
 	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	this->_response = response;
@@ -258,9 +258,171 @@ void Request::setResponse(std::string status, std::pair<std::string, std::string
 		response += "\r\nSet-Cookie: ";
 		for (std::map<std::string, std::string>::iterator it = this->_cookies.begin(); it != this->_cookies.end(); it++)
 			response += it->first + "=" + it->second + "; ";
-		response.pop_back();
+		response = response.substr(0, response.size() - 2);
 	}
 	response += "\r\n" + header.first + ": " + header.second;
 	response += "\r\nContent-Length: " + strSizeToStr(content) + "\r\n\r\n" + content;
 	this->_response = response;
+}
+
+void Request::_parseRequestLine(std::string r)
+{
+	ReqState state = req_start;
+	std::string::iterator cur_begin;
+
+	for (std::string::iterator it = r.begin(); it != r.end(); it++)
+	{
+		switch (state) {
+			case req_start:
+				if (*it == '\r' || *it == '\n')
+					break;
+				if (*it < 'A' || *it > 'Z')
+					throw BadRequest();
+				state = req_method;
+				cur_begin = it;
+				break;
+			case req_method:
+				if (*it == ' ') {
+					setMethod(_parseMethod(r, it - cur_begin));
+					state = req_after_method;
+				}
+				break;
+			case req_after_method:
+				if (*it == '/') {
+					state = req_uri;
+					cur_begin = it;
+					break;
+				}
+				else
+					throw BadRequest();
+			case req_uri:
+				if (*it == ' ') {
+					setPath(_parseURI(r.substr(cur_begin - r.begin(), it - cur_begin)));
+					state = req_after_uri;
+				}
+				break;
+			case req_after_uri:
+				if (*it == 'H') {
+					cur_begin = it;
+					state = req_http_HTTP;
+					break;
+				}
+				throw BadRequest();
+			case req_http_HTTP:
+				if (*it == 'T' || *it == 'P')
+					break;
+				if (*it == '/') {
+					if (!_isHTTP(r, cur_begin - r.begin(), it - cur_begin + 1))
+						throw BadRequest();
+					state = req_http_version;
+					break;
+				}
+				throw BadRequest();
+			case req_http_version:
+				setHTTPVersion(_parseVersion(r, it - r.begin()));
+				state = req_after_version;
+				it++;
+				it++;
+				break;
+			case req_after_version:
+				if (*it == '\r' && *(it + 1) == '\n')
+					return;
+				throw BadRequest();
+			default:
+				break;
+		}
+	}
+}
+
+
+Methods Request::_parseMethod(std::string r, int len)
+{
+	switch (len) {
+		case 3:
+			if (r.compare(0, 3, "GET") == 0)
+				return GET;
+			throw BadRequest();
+		case 4:
+			if (r.compare(0, 4, "POST") == 0)
+				return POST;
+			throw BadRequest();
+		case 6:
+			if (r.compare(0, 6, "DELETE") == 0)
+				return DELETE;
+			throw BadRequest();
+		default:
+			throw BadRequest();
+	}
+}
+
+float Request::_parseVersion(std::string r, int pos)
+{
+	float version;
+
+	if (!(isdigit(r[pos]) && r[pos + 1] == '.' && isdigit(r[pos + 2]))) {
+		throw BadRequest();
+	}
+	std::string v = r.substr(pos, 3);
+	version = strtof(v.c_str(), NULL);
+	if (version != 1.1f && version != 1.0f && version != 0.9f)
+		throw BadRequest();
+	return version;
+}
+
+std::string Request::_parseURI(std::string r)
+{
+	if (r.find('?') != std::string::npos)
+	{
+		size_t pos = r.find('?');
+		setQuery(r.substr(pos + 1));
+		return r.substr(0, pos);
+	}
+	return r;
+}
+
+bool Request::_isHTTP(std::string r, int pos, int len)
+{
+	if (r.compare(pos, len, "HTTP/") == 0)
+		return true;
+	return false;
+}
+
+void Request::_parseCookies(std::string cookies)
+{
+	size_t start = 0;
+	size_t end = cookies.find("; ");
+	while (end != std::string::npos && end != start)
+	{
+		std::string cookie = cookies.substr(start, end - start);
+		size_t sep = cookie.find("=");
+		if (sep == std::string::npos)
+			throw BadRequest();
+		std::string key = cookie.substr(0, sep);
+		std::string value = cookie.substr(sep + 1);
+		setCookie(key, value);
+		start = end + 2;
+		end = cookies.find("; ", start);
+	}
+	setHasCookies(true);
+}
+
+void Request::_parseHeaders(std::string headers)
+{
+	size_t start = 0;
+	size_t end = headers.find("\r\n");
+	while (end != std::string::npos && end != start)
+	{
+		std::string header = headers.substr(start, end - start);
+		size_t sep = header.find(": ");
+		if (sep == std::string::npos)
+			throw BadRequest();
+		std::string key = header.substr(0, sep);
+		std::string value = header.substr(sep + 2);
+		if (key == "Cookie")
+			_parseCookies(value);
+		else
+			addHeader(key, value);
+		start = end + 2;
+		end = headers.find("\r\n", start);
+	}
 }
