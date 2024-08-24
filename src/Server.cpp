@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <cstring>
+#include <sys/socket.h>
 
 int sig = 0;
 
@@ -122,6 +123,8 @@ void Server::startServer()
 									it_client->second.readRequest();
 								}
 								catch (std::exception &e) {
+									std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
+									send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
 									it->getClients().erase(event_fd);
 									close(event_fd);
 									break;
