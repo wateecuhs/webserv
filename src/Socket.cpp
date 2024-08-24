@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/24 15:05:02 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 17:55:10 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -393,7 +393,6 @@ void Socket::_handleGetRequest(Request &request, Location *location, int client_
 
 	if (location) {
 		std::string	file_extension = path.substr(path.find_last_of('.'));
-		std::cout << file_extension << std::endl;
 		if (location->getUseCGI() && !location->getCGIPath(file_extension).empty()) {
 			this->_handleCGI(request, location, client_fd);
 			file.close();
