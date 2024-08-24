@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/24 15:03:53 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 15:07:21 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Request::Request(std::string request)
 	if (headers_start == std::string::npos || headers_end == std::string::npos)
 		throw BadRequest();
 
-	_hasCookies = false;
 	_parseRequestLine(request.substr(0, headers_start));
 	_parseHeaders(request.substr(headers_start, headers_end));
 	setHost(this->_headers["Host"]);
