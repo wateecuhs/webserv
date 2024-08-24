@@ -110,31 +110,39 @@ void Server::startServer()
 					_event.data.fd = client_socket;
 					_event.events = EPOLLIN | EPOLLOUT;
 					epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
+					break;
 				}
-				else
+				for (std::map<int, Client>::iterator it_client = it->getClients().begin(); it_client != it->getClients().end(); it_client++)
 				{
-					for (std::map<int, Client>::iterator it_client = it->getClients().begin(); it_client != it->getClients().end(); it_client++)
+					if (it_client->first == event_fd)
 					{
-						if (it_client->first == event_fd)
+						if (events & EPOLLIN)
 						{
-							if (events & EPOLLIN)
-							{
-								try {
-									it_client->second.readRequest();
-								}
-								catch (std::exception &e) {
-									std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
-									send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
-									it->getClients().erase(event_fd);
-									close(event_fd);
+							try {
+								if (it_client->second.readRequest() == 0) {
+									close(it_client->first);
+									it->getClients().erase(it_client);
 									break;
 								}
 							}
-							if (events & EPOLLOUT && it_client->second.isReady())
-							{
-								it->sendResponse(it_client->second.getRequest(), it_client->first);
+							catch (std::exception &e) {
+								std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
+								send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
+								close(event_fd);
+								it->getClients().erase(event_fd);
+								break;
 							}
 						}
+						if (events & EPOLLOUT && it_client->second.isReady())
+						{
+							it->sendResponse(it_client->second.getRequest(), it_client->first);
+							it_client->second.setReady(false);
+						}
+					}
+					if (it_client->second.isTimedOut())
+					{
+						close(it_client->first);
+						it->getClients().erase(it_client);
 					}
 				}
 			}

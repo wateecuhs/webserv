@@ -16,6 +16,7 @@
 #include <string>
 #include "Request.hpp"
 #include <vector>
+#include <time.h>
 
 class Client
 {
@@ -23,6 +24,7 @@ class Client
 		int						_fd;
 		Request					_request;
 		bool					_isReady;
+		time_t					_lastRequestTime;
 
 	public:
 		Client();
@@ -34,9 +36,10 @@ class Client
 		void					setFd(int fd);
 		int						getFd() const;
 		Request					getRequest() const;
-		void					readRequest();
+		int						readRequest();
 		bool					isReady();
 		void					setReady(bool ready);
+		bool					isTimedOut();
 
 };
 
