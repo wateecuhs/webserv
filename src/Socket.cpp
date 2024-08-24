@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/30 17:26:18 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 17:24:08 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 15:05:02 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,11 +276,9 @@ void Socket::sendResponse(Request request, int client_fd)
 	}
 	catch (const std::exception &e) {
 		std::string response = e.what();
-		// int 		status_code = ft_strtoi(response.substr(9, 3));
 		int 		status_code = ft_strtoi(response.substr(0, 3));
 
 		std::cout << response.substr(0, response.find("\r\n")) << " - " << request.getPath() << std::endl;
-		// std::cout << "1" << request.getResponse() << std::endl;
 
 		if (_error_pages.find(status_code) != _error_pages.end()) {
 			std::ifstream file(_error_pages[status_code].c_str());
@@ -296,7 +294,6 @@ void Socket::sendResponse(Request request, int client_fd)
 		}
 		else
 			request.setResponse(response, "");
-		// std::cout << "2" << request.getResponse() << std::endl;
 		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
 			close(client_fd);
 			return ;
@@ -451,9 +448,7 @@ void Socket::_handlePostRequest(Request &request, Location *location, int client
 	if (!file) {
 		file.open(path.c_str(), std::ios::out | std::ios::trunc);
 		if (!file) {
-			// std::cout << "BONJOUR PIERRE" << std::endl;
 			file.close();
-			//open pas protege du coup
 			throw NotFound404();
 		}
 		std::string body = request.getBody();

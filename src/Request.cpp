@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/24 14:31:34 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 15:03:53 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,7 +334,6 @@ void Request::_parseRequestLine(std::string r)
 		}
 	}
 }
-
 
 Methods Request::_parseMethod(std::string r, int len)
 {
