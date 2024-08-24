@@ -18,9 +18,9 @@
 #include "utils.hpp"
 #include <cstdlib>
 
-Request::Request() {}
+Request::Request(): _hasCookies(false) {}
 
-Request::Request(std::string request)
+Request::Request(std::string request): _hasCookies(false)
 {
 	size_t					headers_start;
 	size_t					headers_end;
@@ -44,7 +44,7 @@ Request::~Request()
 {
 }
 
-Request::Request(Request &src)
+Request::Request(Request &src): _hasCookies(false)
 {
 	*this = src;
 }
