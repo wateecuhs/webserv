@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 16:59:11 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 15:07:21 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,7 +334,6 @@ void Request::_parseRequestLine(std::string r)
 	}
 }
 
-
 Methods Request::_parseMethod(std::string r, int len)
 {
 	switch (len) {
@@ -391,6 +390,8 @@ void Request::_parseCookies(std::string cookies)
 {
 	size_t start = 0;
 	size_t end = cookies.find("; ");
+	if (end == std::string::npos)
+		end = cookies.size();
 	while (end != std::string::npos && end != start)
 	{
 		std::string cookie = cookies.substr(start, end - start);

@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/02 13:37:57 by alermolo          #+#    #+#             */
-/*   Updated: 2024/08/22 14:04:57 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/22 17:04:52 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,42 +17,42 @@
 
 const char *Forbidden403::what() const throw()
 {
-	return "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\n\r\n";
+	return "403 Forbidden";
 }
 
 const char *NotFound404::what() const throw()
 {
-	return "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n";
+	return "404 Not Found";
 }
 
 const char *MethodNotAllowed405::what() const throw()
 {
-	return "HTTP/1.1 405 Method Not Allowed\r\nContent-Length: 0\r\n\r\n";
+	return "405 Method Not Allowed";
 }
 
 const char *RequestTimeout408::what() const throw()
 {
-	return "HTTP/1.1 408 Request Timeout\r\nContent-Length: 0\r\n\r\n";
+	return "408 Request Timeout";
 }
 
 const char *InternalServerError500::what() const throw()
 {
-	return "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
+	return "500 Internal Server Error";
 }
 
 const char *BadGateway502::what() const throw()
 {
-	return "HTTP/1.1 502 Bad Gateway\r\nContent-Length: 0\r\n\r\n";
+	return "502 Bad Gateway";
 }
 
 const char *ContentTooLarge413::what() const throw()
 {
-	return "HTTP/1.1 413 Content Too Large	\r\nContent-Length: 0\r\n\r\n";
+	return "413 Content Too Large";
 }
 
 const char *URITooLong414::what() const throw()
 {
-	return "HTTP/1.1 414 URI Too Long	\r\nContent-Length: 0\r\n\r\n";
+	return "414 URI Too Long";
 }
 
 const char *InvalidConfigFile::what() const throw()
@@ -67,5 +67,5 @@ const char *BadInput::what() const throw()
 
 const char *BadRequest::what() const throw()
 {
-	return "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n";
+	return "400 Bad Request";
 }
