@@ -127,8 +127,7 @@ VirtualServer &VirtualServer::operator=(const VirtualServer &copy)
 		this->_host = copy.getHost();
 		this->_port = copy.getPort();
 		this->_server_names.clear();
-		for (size_t i = 0; i < copy.getServerNames().size(); i++)
-			this->_server_names.push_back(copy.getServerNames()[i]);
+		this->_server_names = copy.getServerNames();
 		this->_error_pages = copy.getErrorPages();
 		this->_body_size = copy.getBodySize();
 		this->_locations = copy.getLocations();

@@ -47,6 +47,8 @@ Server &Server::operator=(const Server &copy)
 	{
 		this->_sockets = copy.getSockets();
 		this->_epoll_fd = copy.getEpollFd();
+		this->_epoll_events = copy._epoll_events;
+		this->_sockets = copy.getSockets();
 	}
 	return (*this);
 }
@@ -112,7 +114,8 @@ void Server::startServer()
 					epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
 					break;
 				}
-				for (std::map<int, Client>::iterator it_client = it->getClients().begin(); it_client != it->getClients().end(); it_client++)
+				clients = it->getClients();
+				for (std::map<int, Client>::iterator it_client = clients.begin(); it_client != clients.end(); it_client++)
 				{
 					if (it_client->first == event_fd)
 					{
@@ -122,7 +125,7 @@ void Server::startServer()
 								if (it_client->second.readRequest() == 0) {
 									close(it_client->first);
 									it->getClients().erase(it_client);
-									break;
+									continue;
 								}
 							}
 							catch (std::exception &e) {
@@ -130,7 +133,7 @@ void Server::startServer()
 								send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
 								close(event_fd);
 								it->getClients().erase(event_fd);
-								break;
+								continue;
 							}
 						}
 						if (events & EPOLLOUT && it_client->second.isReady())
@@ -144,6 +147,7 @@ void Server::startServer()
 						close(it_client->first);
 						it->getClients().erase(it_client);
 					}
+					clients = it->getClients();
 				}
 			}
 		}
