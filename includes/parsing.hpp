@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/11 14:50:31 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 16:47:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/25 19:26:14 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSING_H
 # define PARSING_H
 
-#include "Socket.hpp"
+#include "VirtualServer.hpp"
 #include "enums.hpp"
 #include <iostream>
 #include <fstream>
@@ -21,8 +21,8 @@
 
 void			parseRequestLine(std::string r, Request &request);
 void			parseHeaders(std::string r, Request &req);
-void			verifyAddHostPort(std::string content, Socket &socket);
-ConfState		verifyErrorPageMatch(std::string word, std::stringstream &iss, Socket &socket);
+void			verifyAddHostPort(std::string content, VirtualServer &VirtualServer);
+ConfState		verifyErrorPageMatch(std::string word, std::stringstream &iss, VirtualServer &VirtualServer);
 bool			validateLocation(std::string path);
 bool			validateRoot(std::string path);
 bool			validateDefaultFile(std::string path);

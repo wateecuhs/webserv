@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 15:56:28 by waticouz          #+#    #+#             */
-/*   Updated: 2024/08/07 15:56:29 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:27:51 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int Client::readRequest()
 {
 	_lastRequestTime = time(NULL);
 	char buf[4096] = {0};
-	size_t cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
+	int cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
 	if (cr < 0)
 		throw BadRequest();
 	if (cr == 0)

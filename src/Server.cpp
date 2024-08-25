@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:08:51 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Server::Server(std::string config): _epoll_events(10)
 		throw InvalidConfigFile();
 	std::string content((std::istreambuf_iterator<char>(cfstream)),
 						 std::istreambuf_iterator<char>());
-	this->_sockets = _parseServers(content);
+	_parseServers(content);
 	this->_epoll_fd = epoll_create(1);
 }
 
@@ -151,9 +151,8 @@ void Server::startServer()
 	std::cout << "Signal received, closing server.." << std::endl;
 }
 
-std::vector<Socket> Server::_parseServers(std::string content)
+void Server::_parseServers(std::string content)
 {
-	std::vector<Socket>	sockets;
 	std::stringstream	iss(content);
 	std::string			word;
 	ConfState			state = conf_server;
@@ -165,8 +164,8 @@ std::vector<Socket> Server::_parseServers(std::string content)
 				if (word == "server")
 					state = conf_server_brace;
 				else if (word == "server{"){
-					Socket tmp(iss, word);
-					sockets.push_back(tmp);
+					VirtualServer tmp(iss, word);
+					this->addVirtualServer(tmp);
 				}
 				else
 					throw InvalidConfigFile();
@@ -174,18 +173,32 @@ std::vector<Socket> Server::_parseServers(std::string content)
 
 			case conf_server_brace:
 				if (word == "{") {
-					Socket tmp(iss, word);
-					sockets.push_back(tmp);
+					VirtualServer tmp(iss, word);
+					this->addVirtualServer(tmp);
 					state = conf_server;
 				}
-				else
+				else {
 					throw InvalidConfigFile();
+				}
 				break;
 			default:
 				throw InvalidConfigFile();
 		}
 	}
-	if (sockets.empty())
+	if (this->_sockets.empty())
 		throw InvalidConfigFile();
-	return sockets;
+}
+
+void Server::addVirtualServer(VirtualServer VirtualServer)
+{
+	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+		if (it->getHost() == VirtualServer.getHost() && it->getPort() == VirtualServer.getPort())
+		{
+			it->addVirtualServer(VirtualServer);
+			return ;
+		}
+	}
+	Socket socket(VirtualServer.getHost(), VirtualServer.getPort());
+	socket.addVirtualServer(VirtualServer);
+	this->_sockets.push_back(socket);
 }

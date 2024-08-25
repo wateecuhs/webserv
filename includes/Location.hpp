@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Location.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:20:22 by panger            #+#    #+#             */
-/*   Updated: 2024/08/09 15:47:49 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:26:14 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 # define LOCATION_HPP
 
 #include <string>
-#include "Socket.hpp"
+#include "VirtualServer.hpp"
 #include <map>
 
-class Socket;
+class VirtualServer;
 
 class Location
 {
