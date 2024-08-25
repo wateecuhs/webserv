@@ -133,32 +133,25 @@ int Socket::startListening(int epfd)
 void Socket::sendResponse(Request request, int client_fd)
 {
 	std::string host;
+	std::vector<std::string> server_names;
 	try {
-		std::string host = request.getHeaders().find("Host")->second;
+		host = request.getHeaders().find("Host")->second;
 	}
 	catch (...) {}
-	std::vector<VirtualServer>::iterator it = _virtual_servers.begin();
-	// std::cout <<  "eeeeee " << _virtual_servers.size() << std::endl;
-	// for (it = _virtual_servers.begin(); it != _virtual_servers.end(); it++)
-	// {
-	// 	std::cout << "maaaa " << it->getServerNames().size() << std::endl;
-	// 	std::cout << *it->getServerNames().begin() << std::endl;
-	// 	for (std::vector<std::string>::iterator it2 = it->getServerNames().begin(); it2 != it->getServerNames().end(); it2++)
-	// 	{
-	// 		if (host == *it2)
-	// 			break;
-	// 	}
-	// }
-	// for (it = _virtual_servers.end()--; it != _virtual_servers.begin(); it--)
-	// {
-	// 	std::cout << it->getServerNames().size() << std::endl;
-	// 	for (std::vector<std::string>::iterator it2 = it->getServerNames().begin(); it2 != it->getServerNames().end(); it2++)
-	// 	{
-	// 		if (host == *it2)
-	// 			break;
-	// 	}
-	// }
-	it->sendResponse(request, client_fd);
+
+	for (std::vector<VirtualServer>::iterator it = _virtual_servers.begin(); it != _virtual_servers.end(); it++)
+	{
+		server_names = it->getServerNames();
+		for (std::vector<std::string>::iterator it2 = server_names.begin(); it2 != server_names.end(); it2++)
+		{
+			if (host == *it2)
+			{
+				it->sendResponse(request, client_fd);
+				return ;
+			}
+		}
+	}
+	_virtual_servers.begin()->sendResponse(request, client_fd);
 }
 
 
