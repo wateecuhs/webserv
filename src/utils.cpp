@@ -40,7 +40,7 @@ size_t ft_strtoul_hex(std::string str)
 		else if (*it >= 'A' && *it <= 'F')
 			ret = ret * 16 + *it - 'A' + 10;
 		else
-			throw BadInput();
+			throw BadRequest();
 	}
 	return ret;
 }

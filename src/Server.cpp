@@ -152,9 +152,7 @@ void Server::startServer()
 	}
 	std::cout << "\b\bSignal received, closing server.." << std::endl;
 	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
-	{
 		close(it->getFd());
-	}
 	close(this->_epoll_fd);
 }
 

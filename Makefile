@@ -41,7 +41,7 @@ OBJ_DIR		=	.build
 SRC_DIR		=	src/
 INC_DIR		=	includes/
 
-CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP -g3 -fsanitize=address #-Werror
+CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP -g3 -Werror
 
 SRCS		=	$(addprefix $(SRC_DIR), $(RAW_SOURCES))
 INCLUDES	=	$(addprefix $(INC_DIR), $(HEADERS))
