@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/01 17:26:13 by panger            #+#    #+#             */
-/*   Updated: 2024/08/22 16:16:09 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 16:44:31 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,8 @@ Location &Location::operator=(const Location &copy)
 
 void Location::setRoot(std::string root)
 {
+	if (root.size() && root[root.size() - 1] != '/')
+		root += '/';
 	this->_root = root;
 }
 
