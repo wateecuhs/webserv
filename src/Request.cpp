@@ -18,9 +18,9 @@
 #include "utils.hpp"
 #include <cstdlib>
 
-Request::Request(): _hasCookies(false) {}
+Request::Request(): _method(GET), _pathIsDirectory(false), _hasCookies(false) {}
 
-Request::Request(std::string request): _hasCookies(false)
+Request::Request(std::string request): _method(GET), _pathIsDirectory(false), _hasCookies(false)
 {
 	size_t					headers_start;
 	size_t					headers_end;
@@ -49,7 +49,7 @@ Request::~Request()
 {
 }
 
-Request::Request(Request &src): _hasCookies(false)
+Request::Request(Request &src): _method(GET), _pathIsDirectory(false), _hasCookies(false)
 {
 	*this = src;
 }
