@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 15:56:28 by waticouz          #+#    #+#             */
-/*   Updated: 2024/08/07 15:56:29 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:27:51 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,23 +54,33 @@ Request Client::getRequest() const
 	return (this->_request);
 }
 
+#include <string.h>
+#include <errno.h>
+
 int Client::readRequest()
 {
-	_lastRequestTime = time(NULL);
 	char buf[4096] = {0};
-	size_t cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
-	if (cr < 0)
-		throw BadRequest();
-	if (cr == 0)
+	std::string request;
+	int bytes_read = 0;
+
+	_lastRequestTime = time(NULL);
+	while (1)
 	{
-		close(_fd);
-		_fd = -1;
-		return (0);
+		bytes_read = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
+		if (bytes_read < 0)
+			return 0;
+		if (bytes_read == 0) {
+			close(_fd);
+			_fd = -1;
+			return 0;
+		}
+		request.append(buf, bytes_read);
+		if (request.find("\r\n\r\n") != std::string::npos)
+			break;
 	}
-	buf[cr] = '\0';
 	_request = Request(std::string(buf));
 	_isReady = true;
-	return (cr);
+	return (request.length());
 }
 
 bool Client::isReady()

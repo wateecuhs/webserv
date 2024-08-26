@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
 /*   Updated: 2024/08/22 14:48:55 by alermolo         ###   ########.fr       */
@@ -30,7 +30,7 @@ Server::Server(std::string config): _epoll_events(10)
 		throw InvalidConfigFile();
 	std::string content((std::istreambuf_iterator<char>(cfstream)),
 						 std::istreambuf_iterator<char>());
-	this->_sockets = _parseServers(content);
+	_parseServers(content);
 	this->_epoll_fd = epoll_create(1);
 }
 
@@ -47,6 +47,8 @@ Server &Server::operator=(const Server &copy)
 	{
 		this->_sockets = copy.getSockets();
 		this->_epoll_fd = copy.getEpollFd();
+		this->_epoll_events = copy._epoll_events;
+		this->_sockets = copy.getSockets();
 	}
 	return (*this);
 }
@@ -84,8 +86,10 @@ void sigHandler(int sig_code)
 
 void Server::startServer()
 {
-	std::map<int, Client>	clients;
-	struct sigaction		action;
+	std::map<int, Client>			clients;
+	struct sigaction				action;
+	std::map<int, Client>::iterator	tmp;
+	Client							client;
 
 	std::memset(&action, 0, sizeof(action));
 	action.sa_handler = sigHandler;
@@ -112,48 +116,50 @@ void Server::startServer()
 					epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
 					break;
 				}
-				for (std::map<int, Client>::iterator it_client = it->getClients().begin(); it_client != it->getClients().end(); it_client++)
+				clients = it->getClients();
+				if (clients.find(event_fd) == clients.end())
+					continue;
+				client = clients.find(event_fd)->second;
+				if (events & EPOLLIN)
 				{
-					if (it_client->first == event_fd)
-					{
-						if (events & EPOLLIN)
-						{
-							try {
-								if (it_client->second.readRequest() == 0) {
-									close(it_client->first);
-									it->getClients().erase(it_client);
-									break;
-								}
-							}
-							catch (std::exception &e) {
-								std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
-								send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
-								close(event_fd);
-								it->getClients().erase(event_fd);
-								break;
-							}
-						}
-						if (events & EPOLLOUT && it_client->second.isReady())
-						{
-							it->sendResponse(it_client->second.getRequest(), it_client->first);
-							it_client->second.setReady(false);
+					try {
+						if (client.readRequest() == 0) {
+							close(event_fd);
+							it->getClientsRef().erase(event_fd);
+							continue;
 						}
 					}
-					if (it_client->second.isTimedOut())
-					{
-						close(it_client->first);
-						it->getClients().erase(it_client);
+					catch (std::exception &e) {
+						std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
+						send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
+						close(event_fd);
+						it->getClientsRef().erase(event_fd);
+						continue;
 					}
+				}
+				if (events & EPOLLOUT && client.isReady())
+				{
+					it->sendResponse(client.getRequest(), event_fd);
+					client.setReady(false);
+				}
+				if (client.isTimedOut())
+				{
+					close(event_fd);
+					it->getClientsRef().erase(event_fd);
 				}
 			}
 		}
 	}
 	std::cout << "\b\bSignal received, closing server.." << std::endl;
+	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
+	{
+		close(it->getFd());
+	}
+	close(this->_epoll_fd);
 }
 
-std::vector<Socket> Server::_parseServers(std::string content)
+void Server::_parseServers(std::string content)
 {
-	std::vector<Socket>	sockets;
 	std::stringstream	iss(content);
 	std::string			word;
 	ConfState			state = conf_server;
@@ -165,8 +171,8 @@ std::vector<Socket> Server::_parseServers(std::string content)
 				if (word == "server")
 					state = conf_server_brace;
 				else if (word == "server{"){
-					Socket tmp(iss, word);
-					sockets.push_back(tmp);
+					VirtualServer tmp(iss, word);
+					this->addVirtualServer(tmp);
 				}
 				else
 					throw InvalidConfigFile();
@@ -174,18 +180,32 @@ std::vector<Socket> Server::_parseServers(std::string content)
 
 			case conf_server_brace:
 				if (word == "{") {
-					Socket tmp(iss, word);
-					sockets.push_back(tmp);
+					VirtualServer tmp(iss, word);
+					this->addVirtualServer(tmp);
 					state = conf_server;
 				}
-				else
+				else {
 					throw InvalidConfigFile();
+				}
 				break;
 			default:
 				throw InvalidConfigFile();
 		}
 	}
-	if (sockets.empty())
+	if (this->_sockets.empty())
 		throw InvalidConfigFile();
-	return sockets;
+}
+
+void Server::addVirtualServer(VirtualServer VirtualServer)
+{
+	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+		if (it->getHost() == VirtualServer.getHost() && it->getPort() == VirtualServer.getPort())
+		{
+			it->addVirtualServer(VirtualServer);
+			return ;
+		}
+	}
+	Socket socket(VirtualServer.getHost(), VirtualServer.getPort());
+	socket.addVirtualServer(VirtualServer);
+	this->_sockets.push_back(socket);
 }

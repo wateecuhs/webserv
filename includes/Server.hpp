@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/07 16:15:55 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/25 20:00:40 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 # define SERVER_HPP
 
 #include <sys/epoll.h>
+#include "VirtualServer.hpp"
 #include "Socket.hpp"
 #include <vector>
+
+class Socket;
 
 class Server
 {
@@ -23,7 +26,7 @@ class Server
 		std::vector<Socket>			_sockets;
 		int							_epoll_fd;
 		std::vector<epoll_event>	_epoll_events;
-		std::vector<Socket>			_parseServers(std::string content);
+		void						_parseServers(std::string content);
 		Server();
 
 	public:
@@ -31,12 +34,13 @@ class Server
 		~Server();
 		Server(const Server &copy);
 		Server &operator=(const Server &copy);
-		void					addSocket(Socket socket);
-		std::vector<Socket>		getSockets() const;
-		void					setEpollFd(int epoll_fd);
-		int						getEpollFd() const;
-		void					startServer();
-		void					listenSockets();
+		void								addSocket(Socket socket);
+		std::vector<Socket>					getSockets() const;
+		void								setEpollFd(int epoll_fd);
+		int									getEpollFd() const;
+		void								startServer();
+		void								listenSockets();
+		void								addVirtualServer(VirtualServer VirtualServer);
 };
 
 #endif

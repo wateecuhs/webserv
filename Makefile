@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
+#    By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/08/02 17:18:26 by alermolo         ###   ########.fr        #
+#    Updated: 2024/08/25 19:59:47 by wateecuhs        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,20 +14,22 @@ NAME		=	webserv
 CC			=	c++
 
 HEADERS		=	parsing.hpp								\
-				Socket.hpp								\
+				VirtualServer.hpp						\
 				enums.hpp								\
 				Request.hpp								\
 				utils.hpp								\
 				Location.hpp							\
 				Client.hpp								\
 				Server.hpp								\
+				Socket.hpp								\
 				exceptions.hpp
 
 RAW_SOURCES	=	main.cpp								\
 				Request.cpp								\
-				Socket.cpp								\
+				VirtualServer.cpp						\
 				parsing/conf_utils.cpp					\
 				exceptions.cpp							\
+				Socket.cpp								\
 				Client.cpp								\
 				Server.cpp								\
 				Location.cpp							\
