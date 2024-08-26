@@ -123,7 +123,6 @@ void Server::startServer()
 				if (events & EPOLLIN)
 				{
 					try {
-						std::cout << "Reading request" << std::endl;
 						if (client.readRequest() == 0) {
 							close(event_fd);
 							it->getClientsRef().erase(event_fd);
@@ -131,7 +130,6 @@ void Server::startServer()
 						}
 					}
 					catch (std::exception &e) {
-						std::cout << "Here" << std::endl;
 						std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
 						send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
 						close(event_fd);
@@ -141,7 +139,6 @@ void Server::startServer()
 				}
 				if (events & EPOLLOUT && client.isReady())
 				{
-					std::cout << "Sending response" << std::endl;
 					it->sendResponse(client.getRequest(), event_fd);
 					client.setReady(false);
 				}

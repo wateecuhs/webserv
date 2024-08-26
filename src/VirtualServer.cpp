@@ -207,10 +207,29 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 	}
 	catch (const std::exception &e) {
-		send(client_fd, e.what(), strlen(e.what()), 0);
-		std::string r(e.what());
-		std::cout << r.substr(0, r.find("\r\n")) << " - " << request.getPath() << std::endl;
-		std::cout << "Full response: " << r << std::endl;
+		std::string response = e.what();
+		int 		status_code = ft_strtoi(response.substr(0, 3));
+
+		std::cout << response.substr(0, response.find("\r\n")) << " - " << request.getPath() << std::endl;
+
+		if (_error_pages.find(status_code) != _error_pages.end()) {
+			std::ifstream file(_error_pages[status_code].c_str());
+			if (!file) {
+				request.setResponse(response, "");
+				file.close();
+				close(client_fd);
+				return ;
+			}
+			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			request.setResponse(response, content);
+			file.close();
+		}
+		else
+			request.setResponse(response, "");
+		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
+			close(client_fd);
+			return ;
+		}
 		close(client_fd);
 	}
 }
