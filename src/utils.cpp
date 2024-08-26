@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:42:30 by panger            #+#    #+#             */
-/*   Updated: 2024/08/09 15:46:31 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:45:40 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sstream>
-#include "Socket.hpp"
+#include "VirtualServer.hpp"
 #include "exceptions.hpp"
 #include <sys/stat.h>
+#include <fcntl.h>
 
 int ft_strtoi(std::string str)
 {
@@ -43,4 +44,14 @@ bool pathIsDirectory(const std::string &path)
 	if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
 		return true;
 	return false;
+}
+
+
+void setFDNonBlocking(int fd)
+{
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1)
+		throw std::runtime_error("Failed to get file descriptor flags");
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
+		throw std::runtime_error("Failed to set file descriptor flags");
 }
