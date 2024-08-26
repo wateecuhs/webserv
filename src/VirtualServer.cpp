@@ -378,7 +378,7 @@ void VirtualServer::_handlePostRequest(Request &request, Location *location, int
 		file.open(path.c_str(), std::ios::out | std::ios::trunc);
 		if (!file) {
 			file.close();
-			throw InternalServerError500();
+			throw NotFound404();
 		}
 		std::string body = request.getBody();
 		file << body;
@@ -388,9 +388,7 @@ void VirtualServer::_handlePostRequest(Request &request, Location *location, int
 			throw InternalServerError500();
 		return ;
 	}
-	if (location && location->getUseCGI()) {
-		if (path.find_last_of('.') == std::string::npos)
-			throw BadRequest();
+	if (location && location->getUseCGI() && path.find_last_of('.') != std::string::npos) {
 		std::string	file_extension = path.substr(path.find_last_of('.'));
 		if (!location->getCGIPath(file_extension).empty()) {
 			this->_handleCGI(request, location, client_fd);
