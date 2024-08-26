@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/24 17:44:33 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/26 14:40:27 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -435,8 +435,9 @@ void Request::_parseHeaders(std::string headers)
 
 void	Request::_parseChunkedBody(const std::string &body)
 {
-	size_t start = 0;
 	size_t end = body.find("\r\n");
+	size_t start = end + 2;
+	end = body.find("\r\n", start);
 	size_t chunk_size;
 	std::string chunk;
 
