@@ -343,10 +343,7 @@ void	VirtualServer::_handleUpload(Request &request, Location *location, int clie
 	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path))
-	{
-		std::cout << "path is directory" << std::endl;
 		throw BadRequest();
-	}
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
     if (!file)
@@ -381,7 +378,7 @@ void VirtualServer::_handlePostRequest(Request &request, Location *location, int
 		file.open(path.c_str(), std::ios::out | std::ios::trunc);
 		if (!file) {
 			file.close();
-			throw InternalServerError500();
+			throw NotFound404();
 		}
 		std::string body = request.getBody();
 		file << body;
