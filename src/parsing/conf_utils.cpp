@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   conf_utils.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 14:28:07 by panger            #+#    #+#             */
-/*   Updated: 2024/08/02 17:10:31 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/25 19:26:14 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <sstream>
-#include "Socket.hpp"
+#include "VirtualServer.hpp"
 #include "utils.hpp"
 #include "enums.hpp"
 #include <sys/stat.h>
@@ -51,7 +51,7 @@ int verifyHost(std::string content)
 	return 1;
 }
 
-void verifyAddHostPort(std::string content, Socket &socket)
+void verifyAddHostPort(std::string content, VirtualServer &VirtualServer)
 {
 	if (content.find(":") != std::string::npos)
 	{
@@ -59,24 +59,24 @@ void verifyAddHostPort(std::string content, Socket &socket)
 		std::string port = content.substr(content.find(":") + 1);
 		if (verifyPort(port) == 0 && verifyHost(host) == 0)
 			throw BadInput();
-		socket.setHost(host);
-		socket.setPort(ft_strtoi(port));
+		VirtualServer.setHost(host);
+		VirtualServer.setPort(ft_strtoi(port));
 	}
 	else if (content.find(".") != std::string::npos) {
 		if (verifyHost(content) == 0)
 			throw BadInput();
-		socket.setHost(content);
-		socket.setPort(80);
+		VirtualServer.setHost(content);
+		VirtualServer.setPort(80);
 	}
 	else {
 		if (verifyPort(content) == 0)
 			throw BadInput();
-		socket.setPort(ft_strtoi(content));
-		socket.setHost("*");
+		VirtualServer.setPort(ft_strtoi(content));
+		VirtualServer.setHost("*");
 	}
 }
 
-ConfState verifyErrorPageMatch(std::string word, std::stringstream &iss, Socket &socket)
+ConfState verifyErrorPageMatch(std::string word, std::stringstream &iss, VirtualServer &VirtualServer)
 {
 	struct stat s;
 	std::string path;
@@ -96,7 +96,7 @@ ConfState verifyErrorPageMatch(std::string word, std::stringstream &iss, Socket 
 	}
 	else
 		throw BadInput();
-	socket.addErrorPage(ft_strtoi(error_code), path);
+	VirtualServer.addErrorPage(ft_strtoi(error_code), path);
 	return word[word.size() - 1] == ';' ? conf_new_token : conf_semicolon;
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: waticouz <waticouz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/07 15:56:28 by waticouz          #+#    #+#             */
-/*   Updated: 2024/08/07 15:56:29 by waticouz         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:27:51 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,23 @@ Request Client::getRequest() const
 	return (this->_request);
 }
 
-void Client::readRequest()
+int Client::readRequest()
 {
+	_lastRequestTime = time(NULL);
 	char buf[4096] = {0};
-	size_t cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
+	int cr = recv(_fd, buf, sizeof(buf) - 1, O_NONBLOCK);
+	if (cr < 0)
+		throw BadRequest();
 	if (cr == 0)
-		throw InternalServerError500();
+	{
+		close(_fd);
+		_fd = -1;
+		return (0);
+	}
+	buf[cr] = '\0';
 	_request = Request(std::string(buf));
 	_isReady = true;
+	return (cr);
 }
 
 bool Client::isReady()
@@ -84,3 +93,9 @@ void Client::setFd(int fd)
 	this->_fd = fd;
 }
 
+bool Client::isTimedOut()
+{
+	if (time(NULL) - _lastRequestTime > 10)
+		return (true);
+	return (false);
+}

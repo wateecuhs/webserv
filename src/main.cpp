@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: panger <panger@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 09:49:25 by panger            #+#    #+#             */
-/*   Updated: 2024/08/21 11:02:54 by panger           ###   ########.fr       */
+/*   Updated: 2024/08/25 20:44:23 by wateecuhs        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,6 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include "Server.hpp"
-
-void methodHandler(Request& request);
-
 
 int main(int argc, char **argv)
 {
