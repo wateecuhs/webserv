@@ -343,7 +343,10 @@ void	VirtualServer::_handleUpload(Request &request, Location *location, int clie
 	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
 
 	if (pathIsDirectory(path))
+	{
+		std::cout << "path is directory" << std::endl;
 		throw BadRequest();
+	}
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
     if (!file)
@@ -388,9 +391,7 @@ void VirtualServer::_handlePostRequest(Request &request, Location *location, int
 			throw InternalServerError500();
 		return ;
 	}
-	if (location && location->getUseCGI()) {
-		if (path.find_last_of('.') == std::string::npos)
-			throw BadRequest();
+	if (location && location->getUseCGI() && path.find_last_of('.') != std::string::npos) {
 		std::string	file_extension = path.substr(path.find_last_of('.'));
 		if (!location->getCGIPath(file_extension).empty()) {
 			this->_handleCGI(request, location, client_fd);
