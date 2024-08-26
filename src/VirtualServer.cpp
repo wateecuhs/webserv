@@ -210,14 +210,13 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 		std::string response = e.what();
 		int 		status_code = ft_strtoi(response.substr(0, 3));
 
-		std::cout << response.substr(0, response.find("\r\n")) << " - " << request.getPath() << std::endl;
-
 		if (_error_pages.find(status_code) != _error_pages.end()) {
 			std::ifstream file(_error_pages[status_code].c_str());
 			if (!file) {
 				request.setResponse(response, "");
 				file.close();
 				close(client_fd);
+				std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 				return ;
 			}
 			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -226,6 +225,8 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 		}
 		else
 			request.setResponse(response, "");
+		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
+
 		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
 			close(client_fd);
 			return ;
@@ -340,14 +341,14 @@ void VirtualServer::_handleGetRequest(Request &request, Location *location, int 
 void	VirtualServer::_handleUpload(Request &request, Location *location, int client_fd)
 {
 	std::string path;
-	!location->getRoot().empty() ? path = location->getRoot() + request.getPath().substr(location->getPath().size()) : path = request.getPath();
+	!location->getRoot().empty() ? path = location->getRoot() + location->getUploadPath() + request.getPath().substr(location->getPath().size()) : path = location->getUploadPath() + request.getPath();
 
 	if (pathIsDirectory(path))
 		throw BadRequest();
 
     std::ofstream file(path.c_str(), std::ios::out | std::ios::trunc);
     if (!file)
-		throw InternalServerError500();
+		throw NotFound404();
 
 	if (access(path.c_str(), W_OK) == -1){
 		file.close();
