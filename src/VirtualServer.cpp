@@ -210,6 +210,7 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 		send(client_fd, e.what(), strlen(e.what()), 0);
 		std::string r(e.what());
 		std::cout << r.substr(0, r.find("\r\n")) << " - " << request.getPath() << std::endl;
+		std::cout << "Full response: " << r << std::endl;
 		close(client_fd);
 	}
 }

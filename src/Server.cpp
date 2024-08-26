@@ -123,6 +123,7 @@ void Server::startServer()
 				if (events & EPOLLIN)
 				{
 					try {
+						std::cout << "Reading request" << std::endl;
 						if (client.readRequest() == 0) {
 							close(event_fd);
 							it->getClientsRef().erase(event_fd);
@@ -130,72 +131,34 @@ void Server::startServer()
 						}
 					}
 					catch (std::exception &e) {
+						std::cout << "Here" << std::endl;
 						std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
 						send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
 						close(event_fd);
-						it->getClients().erase(event_fd);
+						it->getClientsRef().erase(event_fd);
 						continue;
 					}
 				}
 				if (events & EPOLLOUT && client.isReady())
 				{
+					std::cout << "Sending response" << std::endl;
 					it->sendResponse(client.getRequest(), event_fd);
 					client.setReady(false);
 				}
 				if (client.isTimedOut())
 				{
-						close(event_fd);
-						it->getClients().erase(event_fd);
+					close(event_fd);
+					it->getClientsRef().erase(event_fd);
 				}
-				/* for (std::map<int, Client>::iterator it_client = clients.begin(); it_client != clients.end(); it_client++)
-				{
-					if (it_client->first == event_fd)
-					{
-						if (events & EPOLLIN)
-						{
-							try {
-								if (it_client->second.readRequest() == 0) {
-									close(it_client->first);
-									it->getClients().erase(it_client);
-									continue;
-								}
-							}
-							catch (std::exception &e) {
-								std::cout << "HTTP/1.1 400 Bad Request" << std::endl;
-								send(event_fd, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n", 45, 0);
-								close(event_fd);
-								it->getClients().erase(event_fd);
-								continue;
-							}
-						}
-						if (events & EPOLLOUT && it_client->second.isReady())
-						{
-							it->sendResponse(it_client->second.getRequest(), it_client->first);
-							it_client->second.setReady(false);
-						}
-					}
-					if (it_client->second.isTimedOut())
-					{
-						close(it_client->first);
-						it->getClients().erase(it_client);
-					}
-					clients = it->getClients();
-				for (std::map<int, Client>::iterator it_client = clients.begin(); it_client != clients.end();)
-				{
-					
-					if (it_client->second.isTimedOut())
-					{
-						close(it_client->first);
-						it->getClients().erase(it_client++);
-					}
-					else
-						++it_client;
-				}
-				} */
 			}
 		}
 	}
 	std::cout << "\b\bSignal received, closing server.." << std::endl;
+	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
+	{
+		close(it->getFd());
+	}
+	close(this->_epoll_fd);
 }
 
 void Server::_parseServers(std::string content)
