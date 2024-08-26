@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+         #
+#    By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/20 14:09:46 by panger            #+#    #+#              #
-#    Updated: 2024/08/25 19:59:47 by wateecuhs        ###   ########.fr        #
+#    Updated: 2024/08/26 14:18:23 by alermolo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,7 @@ RAW_SOURCES	=	main.cpp								\
 				Client.cpp								\
 				Server.cpp								\
 				Location.cpp							\
-				utils.cpp								
+				utils.cpp
 
 
 
@@ -41,7 +41,7 @@ OBJ_DIR		=	.build
 SRC_DIR		=	src/
 INC_DIR		=	includes/
 
-CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP -g3 #-Werror
+CPPFLAGS	=	-Wall -Wextra -std=c++98 -MMD -MP -g3 -fsanitize=address #-Werror
 
 SRCS		=	$(addprefix $(SRC_DIR), $(RAW_SOURCES))
 INCLUDES	=	$(addprefix $(INC_DIR), $(HEADERS))

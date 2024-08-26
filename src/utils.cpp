@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wateecuhs <wateecuhs@student.42.fr>        +#+  +:+       +#+        */
+/*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:42:30 by panger            #+#    #+#             */
-/*   Updated: 2024/08/25 19:45:40 by wateecuhs        ###   ########.fr       */
+/*   Updated: 2024/08/26 14:13:54 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,23 @@ int ft_strtoi(std::string str)
 		if (*it < '0' || *it > '9')
 			throw BadInput();
 		ret = ret * 10 + *it - '0';
+	}
+	return ret;
+}
+
+size_t ft_strtoul_hex(std::string str)
+{
+	size_t ret = 0.0;
+	for (std::string::iterator it = str.begin(); it != str.end(); it++)
+	{
+		if (*it >= '0' && *it <= '9')
+			ret = ret * 16 + *it - '0';
+		else if (*it >= 'a' && *it <= 'f')
+			ret = ret * 16 + *it - 'a' + 10;
+		else if (*it >= 'A' && *it <= 'F')
+			ret = ret * 16 + *it - 'A' + 10;
+		else
+			throw BadInput();
 	}
 	return ret;
 }

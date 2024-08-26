@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/08/21 16:58:41 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/24 17:30:01 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Request {
 		Methods								_parseMethod(std::string r, int len);
 		void								_parseCookies(std::string cookies);
 		void								_parseHeaders(std::string headers);
+		void								_parseChunkedBody(const std::string &body);
 
 	public:
 		Request();

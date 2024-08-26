@@ -6,7 +6,7 @@
 /*   By: alermolo <alermolo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 17:25:42 by panger            #+#    #+#             */
-/*   Updated: 2024/08/24 15:07:21 by alermolo         ###   ########.fr       */
+/*   Updated: 2024/08/26 14:40:27 by alermolo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,12 @@ Request::Request(std::string request): _hasCookies(false)
 	_parseHeaders(request.substr(headers_start, headers_end));
 	setHost(this->_headers["Host"]);
 
-	setBody(request.substr(headers_end + 4));
+	std::string body = request.substr(headers_end + 4);
+	if (this->_headers.find("Transfer-Encoding") != this->_headers.end()
+		&& this->_headers["Transfer-Encoding"] == "chunked")
+		_parseChunkedBody(body);
+	else
+		setBody(body);
 }
 
 Request::~Request()
@@ -425,5 +430,25 @@ void Request::_parseHeaders(std::string headers)
 			addHeader(key, value);
 		start = end + 2;
 		end = headers.find("\r\n", start);
+	}
+}
+
+void	Request::_parseChunkedBody(const std::string &body)
+{
+	size_t end = body.find("\r\n");
+	size_t start = end + 2;
+	end = body.find("\r\n", start);
+	size_t chunk_size;
+	std::string chunk;
+
+	while (end != std::string::npos && end != start)
+	{
+		chunk_size = ft_strtoul_hex(body.substr(start, end - start));
+		if (chunk_size == 0)
+			break;
+		chunk = body.substr(end + 2, chunk_size);
+		this->_body += chunk;
+		start = end + 2 + chunk_size + 2;
+		end = body.find("\r\n", start);
 	}
 }
