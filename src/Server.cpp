@@ -119,6 +119,7 @@ void Server::startServer()
 					int client_socket = it->acceptConnection(event_fd);
 					_event.data.fd = client_socket;
 					_event.events = EPOLLIN | EPOLLOUT;
+					epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
 					break;
 				}
 				clients = it->getClients();
