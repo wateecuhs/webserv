@@ -70,4 +70,10 @@ class URITooLong414: public std::exception {
 	public:
 		virtual const char *what() const throw();
 };
+
+class GatewayTimeout504: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+
 #endif

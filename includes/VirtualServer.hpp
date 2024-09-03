@@ -31,9 +31,6 @@ class VirtualServer
 		std::vector<std::string>			_server_names;
 		size_t								_body_size;
 		std::vector<Location>				_locations;
-		int									_epoll_fd;
-		struct epoll_event					_event;
-		struct epoll_event					_events[10];
 		void								_methodHandler(Request& request, int client_fd);
 		void								_handleDeleteRequest(Request &request, Location *location, int client_fd);
 		void								_handleGetRequest(Request &request, Location *location, int client_fd);

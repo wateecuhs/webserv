@@ -465,8 +465,7 @@ std::string	VirtualServer::_execCGI(Request &request, Location *location)
 		throw InternalServerError500();
 
 	//child process
-	if (pid == 0)
-	{
+	if (pid == 0) {
 		close(pipe_out[0]);
 		close(pipe_in[1]);
 		if (dup2(pipe_out[1], STDOUT_FILENO) == -1 || dup2(pipe_in[0], STDIN_FILENO) == -1)
@@ -483,8 +482,7 @@ std::string	VirtualServer::_execCGI(Request &request, Location *location)
 	}
 
 	//parent process
-	else
-	{
+	else {
 		close(pipe_out[1]);
 		close(pipe_in[0]);
 
@@ -495,13 +493,54 @@ std::string	VirtualServer::_execCGI(Request &request, Location *location)
 		char 				buffer[2048];
 		int 				bytes_read;
 		std::stringstream 	ss;
+		time_t				start = time(NULL);
+		int					epoll_fd = epoll_create1(0);
 
-		while ((bytes_read = read(pipe_out[0], buffer, 2047)) > 0 || ss.eof() || ss.fail()) {
-			if (bytes_read == -1)
-				throw BadGateway502();
-			buffer[bytes_read] = '\0';
-			ss << buffer;
+		setFDNonBlocking(pipe_out[0]);
+		struct epoll_event event;
+		event.events = EPOLLIN;
+		event.data.fd = pipe_out[0];
+		epoll_ctl(epoll_fd, EPOLL_CTL_ADD, pipe_out[0], &event);
+		while (1) {
+			if (time(NULL) - start > 1) {
+				kill(pid, SIGKILL);
+				throw GatewayTimeout504();
+			}
+			int events = epoll_wait(epoll_fd, &event, 1, 5000);
+			if (events == -1)
+				throw InternalServerError500();
+			if (events == 0)
+				continue ;
+			if (event.events & EPOLLIN) {
+				bytes_read = read(pipe_out[0], buffer, 2048);
+				if (bytes_read == -1)
+					throw BadGateway502();
+				if (bytes_read == 0)
+					break ;
+				buffer[bytes_read] = '\0';
+				ss << buffer;
+				if (ss.str().size() > 50000) {
+					kill(pid, SIGKILL);
+					throw InternalServerError500();
+				}
+			}
 		}
+		// while ((bytes_read = read(pipe_out[0], buffer, 64)) > 0 || ss.eof() || ss.fail()) {
+		// 	if (bytes_read == -1)
+		// 		throw BadGateway502();
+		// 	buffer[bytes_read] = '\0';
+		// 	ss << buffer;
+		// 	std::cerr << "BUFFER: " << buffer << std::endl;
+		// 	if (ss.str().size() > 50000) {
+		// 		kill(pid, SIGKILL);
+		// 		std::cout << "Content too large" << std::endl;
+		// 		throw InternalServerError500();
+		// 	}
+		// 	if (time(NULL) - start > 5) {
+		// 		kill(pid, SIGKILL);
+		// 		throw GatewayTimeout504();
+		// 	}
+		// }
 		close(pipe_out[0]);
 
 		waitpid(pid, &status, 0);

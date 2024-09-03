@@ -21,7 +21,7 @@
 
 int sig = 0;
 
-Server::Server(std::string config): _epoll_events(10)
+Server::Server(std::string config): _epoll_events(20)
 {
 	std::ifstream	cfstream;
 
@@ -90,6 +90,8 @@ void Server::startServer()
 	struct sigaction				action;
 	std::map<int, Client>::iterator	tmp;
 	Client							client;
+	int								nfds = 0;
+	int								event_fd = 0;
 
 	std::memset(&action, 0, sizeof(action));
 	action.sa_handler = sigHandler;
@@ -100,28 +102,30 @@ void Server::startServer()
 	this->listenSockets();
 	while (sig == 0)
 	{
-		int nfds = epoll_wait(_epoll_fd, _epoll_events.data(), _epoll_events.size(), 0);
-		for (int i = 0; i < nfds; i++)
-		{
-			int event_fd = this->_epoll_events[i].data.fd;
+		nfds = epoll_wait(_epoll_fd, _epoll_events.data(), _epoll_events.size(), 0);
+		for (int i = 0; i < nfds; i++) {
+			event_fd = this->_epoll_events[i].data.fd;
 			uint32_t events = this->_epoll_events[i].events;
 
-			for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
-			{
+			for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+				for (std::map<int, Client>::iterator itc = clients.begin(); itc != clients.end(); itc++) {
+					if (itc->second.isTimedOut()) {
+						close(itc->first);
+						it->getClientsRef().erase(itc);
+					}
+				}
 				if (it->getFd() == event_fd) {
 					epoll_event _event;
 					int client_socket = it->acceptConnection(event_fd);
 					_event.data.fd = client_socket;
 					_event.events = EPOLLIN | EPOLLOUT;
-					epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, client_socket, &_event);
 					break;
 				}
 				clients = it->getClients();
 				if (clients.find(event_fd) == clients.end())
 					continue;
 				client = clients.find(event_fd)->second;
-				if (events & EPOLLIN)
-				{
+				if (events & EPOLLIN) {
 					try {
 						if (client.readRequest() == 0) {
 							close(event_fd);
@@ -137,15 +141,9 @@ void Server::startServer()
 						continue;
 					}
 				}
-				if (events & EPOLLOUT && client.isReady())
-				{
+				if (events & EPOLLOUT && client.isReady()) {
 					it->sendResponse(client.getRequest(), event_fd);
 					client.setReady(false);
-				}
-				if (client.isTimedOut())
-				{
-					close(event_fd);
-					it->getClientsRef().erase(event_fd);
 				}
 			}
 		}

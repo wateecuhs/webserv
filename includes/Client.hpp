@@ -25,6 +25,7 @@ class Client
 		Request					_request;
 		bool					_isReady;
 		time_t					_lastRequestTime;
+		bool					_hasRequestedBefore;
 
 	public:
 		Client();

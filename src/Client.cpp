@@ -17,7 +17,7 @@
 #include "exceptions.hpp"
 #include <fcntl.h>
 
-Client::Client(): _fd(-1), _isReady(false)
+Client::Client(): _fd(-1), _isReady(false), _lastRequestTime(-1), _hasRequestedBefore(false)
 {
 }
 
@@ -80,6 +80,7 @@ int Client::readRequest()
 	}
 	_request = Request(std::string(buf));
 	_isReady = true;
+	_hasRequestedBefore = true;
 	return (request.length());
 }
 
@@ -105,7 +106,9 @@ void Client::setFd(int fd)
 
 bool Client::isTimedOut()
 {
-	if (time(NULL) - _lastRequestTime > 10)
+	if (_hasRequestedBefore == false)
+		return (false);
+	if (time(NULL) - _lastRequestTime > 5)
 		return (true);
 	return (false);
 }

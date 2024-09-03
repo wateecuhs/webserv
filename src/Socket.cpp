@@ -36,7 +36,7 @@ Socket::Socket(std::string host, int port): _host(host), _port(port)
 {
 }
 
-Socket::~Socket() {}
+Socket::~Socket(){}
 
 Socket::Socket(const Socket &copy)
 {

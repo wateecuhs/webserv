@@ -69,3 +69,8 @@ const char *BadRequest::what() const throw()
 {
 	return "400 Bad Request";
 }
+
+const char *GatewayTimeout504::what() const throw()
+{
+	return "504 Gateway Timeout";
+}
