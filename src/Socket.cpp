@@ -32,7 +32,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 
-Socket::Socket(std::string host, int port): _host(host), _port(port)
+Socket::Socket(std::string host, int port): _fd(-1), _host(host), _port(port)
 {
 }
 

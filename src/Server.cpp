@@ -75,8 +75,19 @@ int Server::getEpollFd() const
 
 void Server::listenSockets()
 {
-	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
-		it->startListening(this->_epoll_fd);
+	try {
+		for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
+			it->startListening(this->_epoll_fd);
+	}
+	catch (std::exception &e) {
+		for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+			if (it->getFd() != -1)
+				close(it->getFd());
+		}
+		if (this->_epoll_fd != -1)
+			close(this->_epoll_fd);
+		throw ;
+	}
 }
 
 void sigHandler(int sig_code)

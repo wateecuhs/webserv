@@ -15,6 +15,7 @@
 #include "exceptions.hpp"
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 int ft_strtoi(std::string str)
 {
