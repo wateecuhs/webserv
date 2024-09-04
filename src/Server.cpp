@@ -143,15 +143,33 @@ void Server::startServer()
 					}
 				}
 				if (events & EPOLLOUT && client.isReady()) {
-					it->sendResponse(client.getRequest(), event_fd);
-					client.setReady(false);
+					try {
+						it->sendResponse(client.getRequest(), event_fd);
+						client.setReady(false);
+					}
+					catch (std::exception &e){
+						if (std::string(e.what()) == "Exit cleanup") {
+							for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+								std::map<int, Client> clients = it->getClients();
+								for (std::map<int, Client>::iterator itc = clients.begin(); itc != clients.end(); itc++)
+									close(itc->first);
+								close(it->getFd());
+							}
+							close(this->_epoll_fd);
+							return ;
+						}
+					}
 				}
 			}
 		}
 	}
 	std::cout << "\b\bSignal received, closing server.." << std::endl;
-	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++)
+	for (std::vector<Socket>::iterator it = this->_sockets.begin(); it != this->_sockets.end(); it++) {
+		std::map<int, Client> clients = it->getClients();
+		for (std::map<int, Client>::iterator itc = clients.begin(); itc != clients.end(); itc++)
+			close(itc->first);
 		close(it->getFd());
+	}
 	close(this->_epoll_fd);
 }
 

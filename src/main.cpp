@@ -28,12 +28,14 @@ int main(int argc, char **argv)
 		std::cerr << "Usage: ./webserv <config_file>" << std::endl;
 		return 1;
 	}
-
 	try {
 		Server server(argv[1]);
 		server.startServer();
 	}
 	catch (std::exception &e) {
+		if (std::string(e.what()) == "Exit cleanup") {
+			return 0;
+		}
 		std::cerr << e.what() << std::endl;
 		return 1;
 	}

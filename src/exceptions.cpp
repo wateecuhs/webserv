@@ -74,3 +74,8 @@ const char *GatewayTimeout504::what() const throw()
 {
 	return "504 Gateway Timeout";
 }
+
+const char *ExitCleanup::what() const throw()
+{
+	return "Exit cleanup";
+}

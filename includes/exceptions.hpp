@@ -76,4 +76,9 @@ class GatewayTimeout504: public std::exception {
 		virtual const char *what() const throw();
 };
 
+class ExitCleanup: public std::exception {
+	public:
+		virtual const char *what() const throw();
+};
+
 #endif

@@ -1,5 +1,5 @@
 from time import sleep
 
-while 438:
-	print("aaaaaaaaaaaaaaaaaaaaaa")
+while True:
+	print("Hello, world!", flush=True)
 	sleep(1)

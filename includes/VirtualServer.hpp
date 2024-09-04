@@ -31,13 +31,16 @@ class VirtualServer
 		std::vector<std::string>			_server_names;
 		size_t								_body_size;
 		std::vector<Location>				_locations;
-		void								_methodHandler(Request& request, int client_fd);
+		pid_t								_pid;
+		bool								_hasForked;
+		void								_methodHandler(Request& request, int client_fd, Location *loc);
 		void								_handleDeleteRequest(Request &request, Location *location, int client_fd);
 		void								_handleGetRequest(Request &request, Location *location, int client_fd);
 		void								_handlePostRequest(Request &request, Location *location, int client_fd);
 		void								_handleUpload(Request &request, Location *location, int client_fd);
 		std::string							_execCGI(Request &request, Location *location);
 		void								_handleCGI(Request &request, Location *location, int client_fd);
+		int									_findLocation(std::string path);
 		VirtualServer();
 	public:
 		VirtualServer(std::stringstream &iss, std::string word);

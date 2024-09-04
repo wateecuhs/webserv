@@ -32,7 +32,7 @@
 
 static std::string	listDirectory(const std::string &path);
 
-VirtualServer::VirtualServer(std::stringstream &iss, std::string word)
+VirtualServer::VirtualServer(std::stringstream &iss, std::string word): _pid(0)
 {
 	ConfState		state = conf_new_token;
 	_locations = std::vector<Location>();
@@ -115,7 +115,7 @@ VirtualServer::~VirtualServer()
 {
 }
 
-VirtualServer::VirtualServer(const VirtualServer &copy)
+VirtualServer::VirtualServer(const VirtualServer &copy): _pid(0)
 {
 	*this = copy;
 }
@@ -196,17 +196,35 @@ std::vector<Location> VirtualServer::getLocations() const
 }
 
 
+
 void VirtualServer::sendResponse(Request request, int client_fd)
 {
+	int loc_idx = -1;
+
 	try {
+		_hasForked = false;
+		_pid = 0;
 		if (request.getPath().size() > 1000)
 			throw URITooLong414();
 		if (request.getBody().size() > (size_t)this->_body_size)
 			throw ContentTooLarge413();
-		this->_methodHandler(request, client_fd);
-		std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
+		loc_idx = _findLocation(request.getPath());
+		if (loc_idx != -1)
+			this->_methodHandler(request, client_fd, &this->_locations[loc_idx]);
+		else
+			this->_methodHandler(request, client_fd, (Location *)NULL);
+		if (_hasForked && _pid == 0) {
+			std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
+			throw ExitCleanup();
+		}
+		else if (!_hasForked)
+			std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
 	}
 	catch (const std::exception &e) {
+		if (e.what() == std::string("Exit cleanup"))
+			throw ExitCleanup();
+		if (_hasForked && _pid > 0)
+			return ;
 		std::string response = e.what();
 		int 		status_code = ft_strtoi(response.substr(0, 3));
 
@@ -217,6 +235,8 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 				file.close();
 				close(client_fd);
 				std::cout << request.getResponse().substr(0, request.getResponse().find("\r\n")) << " - " << request.getPath() << std::endl;
+				if (_hasForked && _pid == 0)
+					throw ExitCleanup();
 				return ;
 			}
 			std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -229,52 +249,50 @@ void VirtualServer::sendResponse(Request request, int client_fd)
 
 		if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1) {
 			close(client_fd);
+			if (_hasForked && _pid == 0)
+				throw ExitCleanup();
 			return ;
 		}
-		close(client_fd);
+		if (_hasForked && _pid == 0)
+			throw ExitCleanup();
 	}
 }
 
-void VirtualServer::_methodHandler(Request& request, int client_fd)
+int VirtualServer::_findLocation(std::string path)
 {
-	std::vector<Location>	locations = this->_locations;
-	std::string				tmp_path;
-	size_t					longest_length = 0;
 	int						loc_idx = -1;
+	size_t					longest_length = 0;
+	std::string				tmp_path;
 
-	for (size_t i = 0; i < locations.size(); i++)
+	for (size_t i = 0; i < this->_locations.size(); i++)
 	{
-		tmp_path = locations[i].getPath();
-		if (request.getPath().rfind(tmp_path, 0) == 0 && (tmp_path.length() > longest_length || longest_length == 0))
+		tmp_path = this->_locations[i].getPath();
+		if (path.rfind(tmp_path, 0) == 0 && (tmp_path.length() > longest_length || longest_length == 0))
 		{
 			longest_length = tmp_path.length();
 			loc_idx = i;
 		}
 	}
+	return loc_idx;
+}
+
+void VirtualServer::_methodHandler(Request& request, int client_fd, Location *loc)
+{
 	switch (request.getMethod()) {
 		case GET:
-			if (loc_idx != -1 && !locations[loc_idx].getMethod(GET))
+			if (loc && !loc->getMethod(GET))
 				throw MethodNotAllowed405();
-			if (loc_idx == -1)
-				this->_handleGetRequest(request, (Location *)NULL, client_fd);
-			else
-				this->_handleGetRequest(request, &locations[loc_idx], client_fd);
+			this->_handleGetRequest(request, loc, client_fd);
 			break;
 		case POST:
-			if (loc_idx != -1 && !locations[loc_idx].getMethod(POST))
+			if (loc && !loc->getMethod(POST))
 				throw MethodNotAllowed405();
-			if (loc_idx == -1)
-				this->_handlePostRequest(request, (Location *)NULL, client_fd);
-			else
-				this->_handlePostRequest(request, &locations[loc_idx], client_fd);
+			this->_handlePostRequest(request, loc, client_fd);
 			break;
 		case DELETE:
-			if (loc_idx != -1 && !locations[loc_idx].getMethod(DELETE))
+		if (loc && !loc->getMethod(DELETE))
 				throw MethodNotAllowed405();
-			if (loc_idx == -1)
-				this->_handleDeleteRequest(request, (Location *)NULL, client_fd);
-			else
-				this->_handleDeleteRequest(request, &locations[loc_idx], client_fd);
+			this->_handleDeleteRequest(request, loc, client_fd);
 			break;
 		default:
 			throw MethodNotAllowed405();
@@ -504,45 +522,42 @@ std::string	VirtualServer::_execCGI(Request &request, Location *location)
 		while (1) {
 			if (time(NULL) - start > 1) {
 				kill(pid, SIGKILL);
+				close(epoll_fd);
+				close(pipe_out[0]);
 				throw GatewayTimeout504();
 			}
-			int events = epoll_wait(epoll_fd, &event, 1, 5000);
-			if (events == -1)
+			int events = epoll_wait(epoll_fd, &event, 1, 0);
+			if (events == -1) {
+				close(pipe_out[0]);
+				close(epoll_fd);
 				throw InternalServerError500();
+			}
 			if (events == 0)
 				continue ;
 			if (event.events & EPOLLIN) {
-				bytes_read = read(pipe_out[0], buffer, 2048);
-				if (bytes_read == -1)
+				bytes_read = read(pipe_out[0], buffer, 1);
+				if (bytes_read == -1) {
+					close(epoll_fd);
+					close(pipe_out[0]);
 					throw BadGateway502();
+				}
 				if (bytes_read == 0)
 					break ;
 				buffer[bytes_read] = '\0';
 				ss << buffer;
-				if (ss.str().size() > 50000) {
+				if (ss.str().size() > 500000) {
 					kill(pid, SIGKILL);
+					close(epoll_fd);
+					close(pipe_out[0]);
 					throw InternalServerError500();
 				}
 			}
+			if (waitpid(pid, &status, WNOHANG) == pid)
+				break ;
 		}
-		// while ((bytes_read = read(pipe_out[0], buffer, 64)) > 0 || ss.eof() || ss.fail()) {
-		// 	if (bytes_read == -1)
-		// 		throw BadGateway502();
-		// 	buffer[bytes_read] = '\0';
-		// 	ss << buffer;
-		// 	std::cerr << "BUFFER: " << buffer << std::endl;
-		// 	if (ss.str().size() > 50000) {
-		// 		kill(pid, SIGKILL);
-		// 		std::cout << "Content too large" << std::endl;
-		// 		throw InternalServerError500();
-		// 	}
-		// 	if (time(NULL) - start > 5) {
-		// 		kill(pid, SIGKILL);
-		// 		throw GatewayTimeout504();
-		// 	}
-		// }
+		std::cout << "broke" << std::endl;
+		close (epoll_fd);
 		close(pipe_out[0]);
-
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 			throw BadGateway502();
@@ -560,14 +575,28 @@ void	VirtualServer::_handleCGI(Request &request, Location *location, int client_
 	if (backup_stdout  == -1)
 		throw InternalServerError500();
 
-	std::string content = this->_execCGI(request, location);
-
-	if (dup2(backup_stdin, STDIN_FILENO) == -1 || dup2(backup_stdout, STDOUT_FILENO) == -1)
+	_pid = fork();
+	_hasForked = true;
+	if (_pid == -1)
 		throw InternalServerError500();
+	if (_pid == 0) {
+		try {
+			std::string content = this->_execCGI(request, location);
+			if (dup2(backup_stdin, STDIN_FILENO) == -1 || dup2(backup_stdout, STDOUT_FILENO) == -1)
+				throw InternalServerError500();
+			close(backup_stdin);
+			close(backup_stdout);
+
+			request.setResponse("200 OK", content);
+			if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
+				throw InternalServerError500();
+		}
+		catch (std::exception &e){
+			close(backup_stdin);
+			close(backup_stdout);
+			throw;
+		}
+	}
 	close(backup_stdin);
 	close(backup_stdout);
-
-	request.setResponse("200 OK", content);
-	if (send(client_fd, request.getResponse().c_str(), request.getResponse().size(), 0) == -1)
-		throw InternalServerError500();
 }

@@ -21,14 +21,14 @@ Client::Client(): _fd(-1), _isReady(false), _lastRequestTime(-1), _hasRequestedB
 {
 }
 
-Client::Client(int client_fd): _isReady(false)
+Client::Client(int client_fd): _isReady(false), _lastRequestTime(-1), _hasRequestedBefore(false)
 {
 	this->_fd = client_fd;
 }
 
 Client::~Client() {}
 
-Client::Client(const Client &copy)
+Client::Client(const Client &copy): _lastRequestTime(-1), _hasRequestedBefore(false)
 {
 	*this = copy;
 }
@@ -40,6 +40,8 @@ Client &Client::operator=(const Client &copy)
 		this->_fd = copy.getFd();
 		this->_request = copy.getRequest();
 		this->_isReady = copy._isReady;
+		this->_lastRequestTime = copy._lastRequestTime;
+		this->_hasRequestedBefore = copy._hasRequestedBefore;
 	}
 	return (*this);
 }
@@ -53,9 +55,6 @@ Request Client::getRequest() const
 {
 	return (this->_request);
 }
-
-#include <string.h>
-#include <errno.h>
 
 int Client::readRequest()
 {
